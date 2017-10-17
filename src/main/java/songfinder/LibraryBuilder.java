@@ -28,6 +28,7 @@ public class LibraryBuilder {
 		library = new Library(order);
 		findFile(new File(inputpath));
 	}
+	
 	/**
 	 * a method to find sub directories.
 	 * @param dir
@@ -72,7 +73,7 @@ public class LibraryBuilder {
 		}
 	}
 	/**
-	 * return LibraryInfo to main().
+	 * get info of all songs.
 	 * @return
 	 */
 	public Library getLibraryInfo() {
