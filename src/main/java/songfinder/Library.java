@@ -20,7 +20,9 @@ public class Library {
 	private String order;
 	private TreeSet<SongInfo> byArtist, byTitle;
 	private TreeMap<String, TreeSet<SongInfo>> byTag;
-	
+	//TODO: I would consider changing byArtist and byTitle from a treeset to something else that allows you to
+	//get song info for all songs of a specific artist or title by getting the artist/title, because later if you wanted songs of specific artist
+	//the way you have it now, you would have to loop through the whole set to get only songs by that artist 
 	public Library(String order) {
 		this.order = order;
 		byArtist = new TreeSet<SongInfo>(new CompareByArtist());
