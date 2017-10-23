@@ -10,7 +10,9 @@ import java.io.File;
 
 public class ParseArgs {
 	private String inputpath, outputpath, order;
-	
+	//TODO: consider having constructor that initializes the data members to empty strings. and putting this functionality in different method to check if args are valid
+	//TODO: maybe add getters for each data member and can call those when you need that info in other classes
+	//TODO: include a way to let users know why program exited, even a simple sysout statement is enough for now 
 	public ParseArgs(String[] args) {
 		if(args.length != 6) {
 			return;
