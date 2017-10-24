@@ -17,7 +17,9 @@ public class ParseArgs {
 		inputpath = "";
 		outputpath = "";
 		order = "";
-		checkArgs(args);
+		if(!checkArgs(args)) {
+			return;
+		}
 		LibraryBuilder lb = new LibraryBuilder(inputpath, outputpath, order);
 		lb.getLibraryInfo().saveToFile(outputpath, order);
 	}
@@ -26,9 +28,9 @@ public class ParseArgs {
 	 * check if args are valid.
 	 * @param args
 	 */
-	private void checkArgs(String[] args) {
+	private boolean checkArgs(String[] args) {
 		if(args.length != 6) {
-			return;
+			return false;
 		}
 		for(int i = 0; i < 5; i++) {
 			if(args[i].equals("-input")) {
@@ -36,7 +38,7 @@ public class ParseArgs {
 				File file = new File(inputpath);
 				if(!file.isDirectory()) {
 					System.out.println("That inputpath is invalid.");
-					return;
+					return false;
 				}
 			}
 			if(args[i].equals("-output")) {
@@ -46,10 +48,11 @@ public class ParseArgs {
 				order = args[i + 1];
 				if(!(order.equals("artist") || order.equals("title") || order.equals("tag"))){
 					System.out.println("The order you demanded is not valid.");
-					return;
+					return false;
 				}
 			}
 		}
+		return true;
 	}
 
 	/**
