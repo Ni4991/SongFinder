@@ -14,6 +14,19 @@ public class ParseArgs {
 	//TODO: maybe add getters for each data member and can call those when you need that info in other classes
 	//TODO: include a way to let users know why program exited, even a simple sysout statement is enough for now 
 	public ParseArgs(String[] args) {
+		inputpath = "";
+		outputpath = "";
+		order = "";
+		checkArgs(args);
+		LibraryBuilder lb = new LibraryBuilder(inputpath, outputpath, order);
+		lb.getLibraryInfo().saveToFile(outputpath, order);
+	}
+	
+	/**
+	 * check if args are valid.
+	 * @param args
+	 */
+	private void checkArgs(String[] args) {
 		if(args.length != 6) {
 			return;
 		}
@@ -22,6 +35,7 @@ public class ParseArgs {
 				inputpath = args[i + 1]; 
 				File file = new File(inputpath);
 				if(!file.isDirectory()) {
+					System.out.println("That inputpath is invalid.");
 					return;
 				}
 			}
@@ -31,11 +45,34 @@ public class ParseArgs {
 			if(args[i].equals("-order")) {
 				order = args[i + 1];
 				if(!(order.equals("artist") || order.equals("title") || order.equals("tag"))){
+					System.out.println("The order you demanded is not valid.");
 					return;
 				}
 			}
 		}
-		LibraryBuilder lb = new LibraryBuilder(inputpath, outputpath, order);
-		lb.getLibraryInfo().saveToFile(outputpath, order);
+	}
+
+	/**
+	 * getter of input path.
+	 * @return
+	 */
+	public String getInputpath() {
+		return inputpath;
+	}
+	
+	/**
+	 * getter of output path.
+	 * @return
+	 */
+	public String getOutputpath() {
+		return outputpath;
+	}
+	
+	/**
+	 * getter of desired order.
+	 * @return
+	 */
+	public String getOrder() {
+		return order;
 	}
 }
