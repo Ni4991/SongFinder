@@ -7,36 +7,31 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Scanner;
 
 /**
- * a class to add .json files to the song library.
+ * A class to add .json files to the song library.
  * @author nina luo
  *
- */
+ */   
 public class LibraryBuilder {
 	private String inputpath, order;
 	private Library library;
 	private WorkQueue wq;
-	private int j;
 	private Lock lock;
-	
 	
 	public LibraryBuilder (String inputpath, int nThreads, String order) {
 		this.order = order;
 		this.inputpath = inputpath;
 		lock = new Lock();
 		library = new Library(order, lock);
-//		System.out.println("order=" + order);
 		wq = new WorkQueue(nThreads);
 		
 	}
 	
-	
 	/**
-	 * a method to find file in sub directories.
+	 * A method to find file in sub directories.
 	 * @param dir
 	 */
 	public void build(File dir) {
@@ -50,25 +45,25 @@ public class LibraryBuilder {
 					continue;
 				}
 				String fileName = files[i].getName();
-				j++;
 				if(fileName.toLowerCase().endsWith(".json")) {
-					System.out.println(files[i].getPath());
 					lock.lockWrite();
 					wq.execute(new Worker(this.getLibrary(), files[i]));
 					lock.unlockWrite();
 				}	
 			}
 		}
-		System.out.println(j);
 	}
 	
-
+	/**
+	 * Return workqueue.
+	 * @return
+	 */
 	public WorkQueue getWorkQueue() {
 		return wq;
 	}
 	
 	/**
-	 * get collection of all songs(sorted).
+	 * Get collection of all songs(sorted).
 	 * @return
 	 */
 	public Library getLibrary() {
