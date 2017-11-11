@@ -42,7 +42,7 @@ public class ParseArgs {
 	 * @param args
 	 */
 	public boolean checkArgs(String[] args) {
-		if(args.length != 6 && args.length != 8) {
+		if(args.length < 6) {
 			System.out.println("incorrect args length.");
 			return false;
 		}
