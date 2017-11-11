@@ -42,7 +42,6 @@ public class Worker implements Runnable {
 			}
 			SongInfo si = new SongInfo(artist, title, tags, track_id);
 			library.add(si);
-//			System.out.println(library.getbyArtist());
 		} catch (FileNotFoundException e1) {
 			System.out.println("file not found.");
 		} catch (JsonParseException pe) {
