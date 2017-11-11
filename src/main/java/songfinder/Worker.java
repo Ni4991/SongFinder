@@ -31,8 +31,7 @@ public class Worker implements Runnable {
 	
 	@Override
 	public void run() { 
-		try {  
-			FileReader fr = new FileReader(file);
+		try(FileReader fr = new FileReader(file)){
 			BufferedReader br = new BufferedReader(fr);
 			String line = br.readLine();
 			JsonParser parser = new JsonParser();
