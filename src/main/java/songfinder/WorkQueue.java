@@ -2,16 +2,21 @@ package songfinder;
 
 import java.util.LinkedList;
 
+/**
+ * A threadpool class.
+ * @author nina luo
+ *
+ */
 public class WorkQueue{
 	
 	private final int nThreads;
 	private final PoolWorker[] threads;
-    private final LinkedList<Runnable> queue;
-    private volatile boolean hasShutdown, isTerminated;
+	private final LinkedList<Runnable> queue;
+	private volatile boolean hasShutdown, isTerminated;
  
-    public WorkQueue(int nThreads){
+	public WorkQueue(int nThreads){
         this.nThreads = nThreads;
-        queue = new LinkedList();
+        queue = new LinkedList<Runnable>();
         threads = new PoolWorker[nThreads];
         hasShutdown = false;
         isTerminated = false;
@@ -22,6 +27,10 @@ public class WorkQueue{
         }
     }
  
+    /**
+     * Execute tasks.
+     * @param r
+     */
     public void execute(Runnable r) {
     	if(!hasShutdown) {
     		synchronized(queue) {
@@ -31,10 +40,14 @@ public class WorkQueue{
     	}
     }
  
+    /**
+     * Inner class of WorkQueue.
+     * @author nina luo
+     *
+     */
     private class PoolWorker extends Thread {
-    	
         public void run() {
-        	Runnable r = null;
+        	Runnable r;
  
         	while(true) {
                 synchronized(queue) {
@@ -43,34 +56,35 @@ public class WorkQueue{
                             queue.wait();
                         }
                         catch (InterruptedException ignored){
-                      
+                             
                         }
                     }
                     if(queue.isEmpty() && hasShutdown) {
                     	break;
                     }
                     r = (Runnable) queue.removeFirst();
+                }  
+                try {
+                	r.run();
                 }
- 
-                // If we don't catch RuntimeException, 
-                // the pool could leak threads
-                if(r != null) {
-                	try {
-                		r.run();
-                	}
-                	catch (RuntimeException e) {
-                    // You might want to log something here
-                	}
+                catch (RuntimeException e) {
+                   // log
                 }
-                r = null;
             }
         }
-}
+    }
     
+    /**
+     * Shutdown workqueue. Do not allow to take new tasks.
+     */
 	public void shutdown() {
 		hasShutdown = true;
 	}
 
+	/**
+	 * Wait for running threads to die.
+	 * @throws InterruptedException
+	 */
 	public void awaitTermination() throws InterruptedException {
 		synchronized(queue) {
 			queue.notifyAll();
@@ -85,6 +99,10 @@ public class WorkQueue{
 				isTerminated = true;
 	}
 	
+	/**
+	 * Get if the workqueue is terminated.
+	 * @return
+	 */
 	public boolean isTerminated() {
 		return isTerminated;
 	}
