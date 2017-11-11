@@ -21,6 +21,7 @@ public class Library {
 	private String order;
 	private TreeMap<String, TreeSet<SongInfo>> byArtist, byTitle, byTag;
 	private Lock lock;
+	
 	public Library(String order, Lock lock) {
 		this.order = order;
 		this.lock = lock;
@@ -29,17 +30,12 @@ public class Library {
 		byTag = new TreeMap<String, TreeSet<SongInfo>>();
 	}
 	
-	
-	public TreeMap<String, TreeSet<SongInfo>> getbyArtist(){
-		return byArtist;
-	}
 	/**
 	 * add each song object to three data structures.
 	 * @param si
 	 */
 	public void add(SongInfo si) {
 		lock.lockWrite();
-//		lock.lockWrite();
 		if(byArtist.containsKey(si.getArtist())) {
 			byArtist.get(si.getArtist()).add(si);
 		}
@@ -47,10 +43,7 @@ public class Library {
 			TreeSet<SongInfo> value = new TreeSet<SongInfo>(new CompareByArtist());
 			value.add(si);
 			byArtist.put(si.getArtist(), value);
-//			System.out.println(byArtist);
 		}
-//		lock.unlockWrite();
-//		lock.lockWrite();
 		if(byTitle.containsKey(si.getTitle())) {
 			byTitle.get(si.getTitle()).add(si);
 		}
@@ -59,8 +52,6 @@ public class Library {
 			value.add(si);
 			byTitle.put(si.getTitle(), value);
 		}
-//		lock.unlockWrite();
-//		lock.lockWrite();
 		for(String tag : si.getTags()) {
 			if(byTag.containsKey(tag)) {
 				byTag.get(tag).add(si);
@@ -71,7 +62,6 @@ public class Library {
 				byTag.put(tag, value);
 			}
 		}
-//		lock.unlockWrite();
 		lock.unlockWrite();
 	}
 	
@@ -98,11 +88,10 @@ public class Library {
 					TreeSet<SongInfo> value = me.getValue();
 					for(SongInfo song : value) {
 						sb.append(song.getArtist() + " - " + song.getTitle() + "\n");
-					}
-				}
+					}   
+				} 
 				output.write(sb.toString());
-//				lock.unlockWrite();
-			}
+			}     
 			else if(order.equals("title")) {
 				lock.lockWrite();
 				Set<Entry<String, TreeSet<SongInfo>>> entrySet = byTitle.entrySet();
@@ -116,10 +105,8 @@ public class Library {
 					}
 				}
 				output.write(sb.toString());
-//				lock.unlockWrite();
 			}
 
-			
 			else if(order.equals("tag")) {
 				lock.lockWrite();
 				StringBuilder sb2 = new StringBuilder();
@@ -133,17 +120,14 @@ public class Library {
 						sb2.append(song.getTrack_id() + " ");
 					}
 					sb.append(str + ": " + sb2 + "\n");
-//					System.out.println("aaaaa");
 					sb2.delete(0, sb2.length());
 				}
 				output.write(sb.toString());
-//				lock.unlockWrite();
 			}
 			lock.unlockWrite();
 		}catch(IOException e) {
 			System.out.print(e.getMessage());	
 		}
-//		lock.unlockWrite();
 		return true;
 	}
 }
