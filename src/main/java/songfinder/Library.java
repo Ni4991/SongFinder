@@ -20,21 +20,26 @@ import java.util.TreeSet;
 public class Library {
 	private String order;
 	private TreeMap<String, TreeSet<SongInfo>> byArtist, byTitle, byTag;
-	//TODO: I would consider changing byArtist and byTitle from a treeset to something else that allows you to
-	//get song info for all songs of a specific artist or title by getting the artist/title, because later if you wanted songs of specific artist
-	//the way you have it now, you would have to loop through the whole set to get only songs by that artist 
-	public Library(String order) {
+	private Lock lock;
+	public Library(String order, Lock lock) {
 		this.order = order;
+		this.lock = lock;
 		byArtist = new TreeMap<String, TreeSet<SongInfo>>();
 		byTitle = new TreeMap<String, TreeSet<SongInfo>>();
 		byTag = new TreeMap<String, TreeSet<SongInfo>>();
 	}
 	
+	
+	public TreeMap<String, TreeSet<SongInfo>> getbyArtist(){
+		return byArtist;
+	}
 	/**
 	 * add each song object to three data structures.
 	 * @param si
 	 */
 	public void add(SongInfo si) {
+		lock.lockWrite();
+//		lock.lockWrite();
 		if(byArtist.containsKey(si.getArtist())) {
 			byArtist.get(si.getArtist()).add(si);
 		}
@@ -42,7 +47,10 @@ public class Library {
 			TreeSet<SongInfo> value = new TreeSet<SongInfo>(new CompareByArtist());
 			value.add(si);
 			byArtist.put(si.getArtist(), value);
+//			System.out.println(byArtist);
 		}
+//		lock.unlockWrite();
+//		lock.lockWrite();
 		if(byTitle.containsKey(si.getTitle())) {
 			byTitle.get(si.getTitle()).add(si);
 		}
@@ -51,6 +59,8 @@ public class Library {
 			value.add(si);
 			byTitle.put(si.getTitle(), value);
 		}
+//		lock.unlockWrite();
+//		lock.lockWrite();
 		for(String tag : si.getTags()) {
 			if(byTag.containsKey(tag)) {
 				byTag.get(tag).add(si);
@@ -61,6 +71,8 @@ public class Library {
 				byTag.put(tag, value);
 			}
 		}
+//		lock.unlockWrite();
+		lock.unlockWrite();
 	}
 	
 	/**
@@ -75,8 +87,11 @@ public class Library {
 		StringBuilder sb = new StringBuilder();
 		try(BufferedWriter output = Files.newBufferedWriter(outPath)){
 			if(order.equals("artist")) {
+				lock.lockWrite();
+				
 				Set<Entry<String, TreeSet<SongInfo>>> entrySet = byArtist.entrySet();
 				Iterator<Entry<String, TreeSet<SongInfo>>> it = entrySet.iterator();
+				
 				while(it.hasNext()) {
 					Entry<String, TreeSet<SongInfo>> me = it.next();
 					String str = me.getKey();
@@ -86,8 +101,10 @@ public class Library {
 					}
 				}
 				output.write(sb.toString());
+//				lock.unlockWrite();
 			}
 			else if(order.equals("title")) {
+				lock.lockWrite();
 				Set<Entry<String, TreeSet<SongInfo>>> entrySet = byTitle.entrySet();
 				Iterator<Entry<String, TreeSet<SongInfo>>> it = entrySet.iterator();
 				while(it.hasNext()) {
@@ -99,8 +116,12 @@ public class Library {
 					}
 				}
 				output.write(sb.toString());
+//				lock.unlockWrite();
 			}
+
+			
 			else if(order.equals("tag")) {
+				lock.lockWrite();
 				StringBuilder sb2 = new StringBuilder();
 				Set<Entry<String, TreeSet<SongInfo>>> entrySet = byTag.entrySet();
 				Iterator<Entry<String, TreeSet<SongInfo>>> it = entrySet.iterator();
@@ -112,13 +133,17 @@ public class Library {
 						sb2.append(song.getTrack_id() + " ");
 					}
 					sb.append(str + ": " + sb2 + "\n");
+//					System.out.println("aaaaa");
 					sb2.delete(0, sb2.length());
 				}
 				output.write(sb.toString());
+//				lock.unlockWrite();
 			}
+			lock.unlockWrite();
 		}catch(IOException e) {
 			System.out.print(e.getMessage());	
 		}
+//		lock.unlockWrite();
 		return true;
 	}
 }

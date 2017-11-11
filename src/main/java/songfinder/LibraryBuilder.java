@@ -5,78 +5,73 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Scanner;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonParser;
 /**
  * a class to add .json files to the song library.
  * @author nina luo
  *
  */
 public class LibraryBuilder {
+	private String inputpath, order;
 	private Library library;
-	private String inputpath, outputpath, order;
-	private JsonObject songObj;
+	private WorkQueue wq;
+	private int j;
+	private Lock lock;
 	
-	public LibraryBuilder (String inputpath, String outputpath, String order) {
-		library = new Library(order);
-		findFile(new File(inputpath));
+	
+	public LibraryBuilder (String inputpath, int nThreads, String order) {
+		this.order = order;
+		this.inputpath = inputpath;
+		lock = new Lock();
+		library = new Library(order, lock);
+//		System.out.println("order=" + order);
+		wq = new WorkQueue(nThreads);
+		
 	}
 	
+	
 	/**
-	 * a method to find sub directories.
+	 * a method to find file in sub directories.
 	 * @param dir
 	 */
-	public void findFile(File dir) {
+	public void build(File dir) {
 		File[] files = dir.listFiles();
 		for(int i = 0; i < files.length; i++) {
 			if(files[i].isDirectory()) {
-				findFile(files[i]);
+				build(files[i]);
 			}
 			else {
 				if(!files[i].exists()) {
 					continue;
 				}
 				String fileName = files[i].getName();
+				j++;
 				if(fileName.toLowerCase().endsWith(".json")) {
-					try {
-						FileReader fr = new FileReader(files[i]);
-						BufferedReader br = new BufferedReader(fr);
-						String line = br.readLine();
-						JsonParser parser = new JsonParser();
-						songObj = (JsonObject) parser.parse(line);
-						String artist = songObj.get("artist").getAsString();
-						String title = songObj.get("title").getAsString();
-						String track_id = songObj.get("track_id").getAsString();
-						JsonArray arr = songObj.get("tags").getAsJsonArray();
-						HashSet<String> tags = new HashSet<String>();
-						for(int j = 0; j < arr.size(); j++) {
-							tags.add(arr.get(j).getAsJsonArray().get(0).getAsString());
-						}
-						SongInfo si = new SongInfo(artist, title, tags, track_id);
-						library.add(si);
-					} catch (FileNotFoundException e1) {
-						System.out.println("file not found.");
-					} catch (JsonParseException pe) {
-						System.err.println("Unable to execute tests. " + pe.getMessage());
-					} catch (IOException e) {
-						e.getMessage();
-					}
+					System.out.println(files[i].getPath());
+					lock.lockWrite();
+					wq.execute(new Worker(this.getLibrary(), files[i]));
+					lock.unlockWrite();
 				}	
 			}
 		}
+		System.out.println(j);
 	}
+	
+
+	public WorkQueue getWorkQueue() {
+		return wq;
+	}
+	
 	/**
-	 * get info of all songs.
+	 * get collection of all songs(sorted).
 	 * @return
 	 */
-	public Library getLibraryInfo() {
+	public Library getLibrary() {
 		return library;	
 	}
 }

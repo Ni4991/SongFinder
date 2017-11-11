@@ -1,6 +1,8 @@
 package songfinder;
 
 import java.io.File;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  * a class to parse arguments.
@@ -10,34 +12,58 @@ import java.io.File;
 
 public class ParseArgs {
 	private String inputpath, outputpath, order;
-	//TODO: consider having constructor that initializes the data members to empty strings. and putting this functionality in different method to check if args are valid
-	//TODO: maybe add getters for each data member and can call those when you need that info in other classes
-	//TODO: include a way to let users know why program exited, even a simple sysout statement is enough for now 
+	private int nThreads;
+
 	public ParseArgs(String[] args) {
 		inputpath = "";
 		outputpath = "";
 		order = "";
+		nThreads = 10;
 		if(!checkArgs(args)) {
+			System.out.println("bad args. change args.");
 			return;
 		}
-		LibraryBuilder lb = new LibraryBuilder(inputpath, outputpath, order);
-		lb.getLibraryInfo().saveToFile(outputpath, order);
+		LibraryBuilder lb = new LibraryBuilder(inputpath, nThreads, order);
+		lb.build(new File(inputpath));
+//		System.out.println(lb.getLibrary().getbyTag());
+//		System.out.println(lb.getLibrary().getbyArtist());
+		lb.getWorkQueue().shutdown();
+		try {
+			lb.getWorkQueue().awaitTermination();
+		} catch (InterruptedException e) {
+			System.out.println("interrupted");
+		}
+		System.out.println(lb.getWorkQueue().isTerminated());
+		if(lb.getWorkQueue().isTerminated()) {
+			System.out.println(lb.getLibrary().getbyArtist());
+			lb.getLibrary().saveToFile(outputpath, order);
+		}
+		
 	}
 	
 	/**
 	 * check if args are valid.
 	 * @param args
 	 */
-	private boolean checkArgs(String[] args) {
-		if(args.length != 6) {
+	public boolean checkArgs(String[] args) {
+		if(args.length != 6 && args.length != 8) {
+			System.out.println("incorrect args length.");
 			return false;
 		}
-		for(int i = 0; i < 5; i++) {
+		for(int i = 0; i < args.length - 1; i++) {
+			if(args[i].equals("-threads")) {
+				try {
+					if(Integer.parseInt(args[i + 1]) > 1 && Integer.parseInt(args[i + 1]) < 1000){
+					nThreads = Integer.parseInt(args[i + 1]);
+					}
+				}catch(NumberFormatException e) {
+					e.getMessage();
+				}
+			}
 			if(args[i].equals("-input")) {
 				inputpath = args[i + 1]; 
-				File file = new File(inputpath);
-				if(!file.isDirectory()) {
-					System.out.println("That inputpath is invalid.");
+				if(!new File(inputpath).isDirectory()) {
+					System.out.println("bad input path");
 					return false;
 				}
 			}
@@ -47,7 +73,7 @@ public class ParseArgs {
 			if(args[i].equals("-order")) {
 				order = args[i + 1];
 				if(!(order.equals("artist") || order.equals("title") || order.equals("tag"))){
-					System.out.println("The order you demanded is not valid.");
+					System.out.println("bad order");
 					return false;
 				}
 			}
@@ -77,5 +103,13 @@ public class ParseArgs {
 	 */
 	public String getOrder() {
 		return order;
+	}
+	
+	/**
+	 * getter of the number of threads.
+	 * @return
+	 */
+	public int getnThreads() {
+		return nThreads;
 	}
 }
