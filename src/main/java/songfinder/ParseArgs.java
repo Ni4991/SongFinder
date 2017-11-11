@@ -6,9 +6,9 @@ import java.util.TreeSet;
 
 /**
  * a class to parse arguments.
- * @author nina luo
+ * @author nina luo     
  *
- */
+ */  
 
 public class ParseArgs {
 	private String inputpath, outputpath, order;
@@ -20,22 +20,18 @@ public class ParseArgs {
 		order = "";
 		nThreads = 10;
 		if(!checkArgs(args)) {
-			System.out.println("bad args. change args.");
+			System.out.println("bad args.");
 			return;
 		}
 		LibraryBuilder lb = new LibraryBuilder(inputpath, nThreads, order);
 		lb.build(new File(inputpath));
-//		System.out.println(lb.getLibrary().getbyTag());
-//		System.out.println(lb.getLibrary().getbyArtist());
 		lb.getWorkQueue().shutdown();
 		try {
 			lb.getWorkQueue().awaitTermination();
 		} catch (InterruptedException e) {
 			System.out.println("interrupted");
 		}
-		System.out.println(lb.getWorkQueue().isTerminated());
 		if(lb.getWorkQueue().isTerminated()) {
-			System.out.println(lb.getLibrary().getbyArtist());
 			lb.getLibrary().saveToFile(outputpath, order);
 		}
 		
@@ -54,7 +50,7 @@ public class ParseArgs {
 			if(args[i].equals("-threads")) {
 				try {
 					if(Integer.parseInt(args[i + 1]) > 1 && Integer.parseInt(args[i + 1]) < 1000){
-					nThreads = Integer.parseInt(args[i + 1]);
+						nThreads = Integer.parseInt(args[i + 1]);
 					}
 				}catch(NumberFormatException e) {
 					e.getMessage();
