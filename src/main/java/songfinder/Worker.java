@@ -13,6 +13,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
+/**
+ * A worker class for the workqueue.
+ * @author nina luo
+ *
+ */
 public class Worker implements Runnable {
 
 	private Library library;
@@ -25,8 +30,8 @@ public class Worker implements Runnable {
 	}
 	
 	@Override
-	public void run() {
-		try {
+	public void run() { 
+		try {  
 			FileReader fr = new FileReader(file);
 			BufferedReader br = new BufferedReader(fr);
 			String line = br.readLine();
@@ -39,7 +44,7 @@ public class Worker implements Runnable {
 			HashSet<String> tags = new HashSet<String>();
 			for(int j = 0; j < arr.size(); j++) {
 				tags.add(arr.get(j).getAsJsonArray().get(0).getAsString());
-			}
+			}   
 			SongInfo si = new SongInfo(artist, title, tags, track_id);
 			library.add(si);
 		} catch (FileNotFoundException e1) {
