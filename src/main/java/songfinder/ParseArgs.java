@@ -18,7 +18,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 /**
- * a class to parse arguments.
+ * a class to parse arguments and more.
  * @author nina luo     
  *
  */  
@@ -76,12 +76,12 @@ public class ParseArgs {
 				String laststr = "";  
 				if(new File(args[i + 1]).isFile()) {
 					try {
-						FileInputStream fileInputStream = new FileInputStream(args[i + 1]);  
-						InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");  
-						reader = new BufferedReader(inputStreamReader);  
-						String tempString = null; 
-						while((tempString = reader.readLine()) != null){  
-							laststr += tempString;  
+						FileInputStream fis = new FileInputStream(args[i + 1]);  
+						InputStreamReader isr = new InputStreamReader(fis, "UTF-8");  
+						reader = new BufferedReader(isr);  
+						String str = null; 
+						while((str = reader.readLine()) != null){  
+							laststr += str;
 						}  
 				        reader.close();  
 						}
@@ -103,12 +103,7 @@ public class ParseArgs {
 					}
 					JsonArray arrSearchByArtist = searchObj.get("searchByArtist").getAsJsonArray();
 					JsonArray arrSearchByTitle = searchObj.get("searchByTitle").getAsJsonArray();
-					if(!laststr.contains("searchByTag")) {
-						JsonArray arrSearchByTag = null;
-						continue;
-					}
 					JsonArray arrSearchByTag = searchObj.get("searchByTag").getAsJsonArray();
-					
 					for(int j = 0; j < arrSearchByArtist.size(); j++) {
 						artistsToSearch.add(arrSearchByArtist.get(j).getAsString());
 					}
@@ -120,7 +115,6 @@ public class ParseArgs {
 					}
 				}
 			}
-	
 			if(args[i].equals("-threads")) {
 				try {
 					if(Integer.parseInt(args[i + 1]) > 1 && Integer.parseInt(args[i + 1]) < 1000){
@@ -155,14 +149,26 @@ public class ParseArgs {
 		return true;
 	}
 
+	/**
+	 * getter of all artists the query wants to search.
+	 * @return
+	 */
 	public ArrayList<String> getSearchByArtist(){
 		return artistsToSearch;
 	}
 	
+	/**
+	 * getter of all titles the query wants to search.
+	 * @return
+	 */
 	public ArrayList<String> getSearchByTitle(){
 		return titlesToSearch;
 	}
 	
+	/**
+	 * getter of all tags the query wants to search.
+	 * @return
+	 */
 	public ArrayList<String> getSearchByTag(){
 		return tagsToSearch;
 	}
