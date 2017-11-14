@@ -15,7 +15,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
 /**
- * A worker class for the workqueue.
+ * a worker class for the workqueue.
  * @author nina luo
  *
  */
