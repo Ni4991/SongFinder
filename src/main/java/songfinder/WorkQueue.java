@@ -3,7 +3,7 @@ package songfinder;
 import java.util.LinkedList;
 
 /**
- * A threadpool class.
+ * a threadpool class.
  * @author nina luo
  *
  */
@@ -28,7 +28,7 @@ public class WorkQueue{
     }
  
     /**
-     * Execute tasks.
+     * execute tasks.
      * @param r
      */
     public void execute(Runnable r) {
@@ -41,7 +41,7 @@ public class WorkQueue{
     }
  
     /**
-     * Inner class of WorkQueue.
+     * inner class of WorkQueue.
      * @author nina luo
      *
      */
@@ -75,14 +75,14 @@ public class WorkQueue{
     }
     
     /**
-     * Shutdown workqueue. Do not allow to take new tasks.
+     * shutdown workqueue. Do not allow to take new tasks.
      */
 	public void shutdown() {
 		hasShutdown = true;
 	}
 
 	/**
-	 * Wait for running threads to die.
+	 * wait for running threads to die.
 	 * @throws InterruptedException
 	 */
 	public void awaitTermination() throws InterruptedException {
@@ -96,11 +96,11 @@ public class WorkQueue{
 				e.printStackTrace();
 			}
 		}
-				isTerminated = true;
+		isTerminated = true;
 	}
 	
 	/**
-	 * Get if the workqueue is terminated.
+	 * get if the workqueue is terminated.
 	 * @return
 	 */
 	public boolean isTerminated() {
