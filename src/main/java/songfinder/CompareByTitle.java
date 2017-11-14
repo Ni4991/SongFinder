@@ -2,6 +2,11 @@ package songfinder;
 
 import java.util.Comparator;
 
+/**
+ * a class to sort by title.
+ * @author nina luo
+ *
+ */
 public class CompareByTitle implements Comparator<SongInfo> {
 	@Override
 	public int compare(SongInfo s1, SongInfo s2) {
