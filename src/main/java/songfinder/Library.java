@@ -1,6 +1,7 @@
 package songfinder;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -64,11 +65,15 @@ public class Library {
 	 */
 	public JSONObject search(ArrayList<String> artistsToSearch, ArrayList<String> titlesToSearch, ArrayList<String> tagsToSearch, String searchOutputpath) throws JSONException {
 		searchOutput = new JSONObject();
-		searchOutput.put( "searchByArtist", searchByArtist(artistsToSearch));
+		if(!artistsToSearch.isEmpty()) {
+			searchOutput.put( "searchByArtist", searchByArtist(artistsToSearch));
+		}
 		if(!tagsToSearch.isEmpty()) {
 			searchOutput.put("searchByTag", searchByTag(tagsToSearch));
 		}
-		searchOutput.put( "searchByTitle", searchByTitle(titlesToSearch));
+		if(!titlesToSearch.isEmpty()) {
+			searchOutput.put( "searchByTitle", searchByTitle(titlesToSearch));
+		}
 		Path outPath = Paths.get(searchOutputpath);
 		outPath.getParent().toFile().mkdirs();
 		try(BufferedWriter output = Files.newBufferedWriter(outPath)){
