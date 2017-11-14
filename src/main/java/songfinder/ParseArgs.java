@@ -71,10 +71,10 @@ public class ParseArgs {
 		}
 		for(int i = 0; i < args.length - 1; i++) {
 			if(args[i].equals("-searchInput")) {
+				doSearch = true;
 				BufferedReader reader = null;  
 				String laststr = "";  
-				if(new File(args[i + 1]).isDirectory()) {
-					doSearch = true;
+				if(new File(args[i + 1]).isFile()) {
 					try {
 						FileInputStream fileInputStream = new FileInputStream(args[i + 1]);  
 						InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");  
@@ -98,9 +98,17 @@ public class ParseArgs {
 			        } 
 					JsonParser parser = new JsonParser();
 					searchObj = (JsonObject) parser.parse(laststr);
+					if(!laststr.contains("searchByArtist") && !laststr.contains("searchByTitle") && !laststr.contains("searchByTag")) {
+						return false;
+					}
 					JsonArray arrSearchByArtist = searchObj.get("searchByArtist").getAsJsonArray();
 					JsonArray arrSearchByTitle = searchObj.get("searchByTitle").getAsJsonArray();
+					if(!laststr.contains("searchByTag")) {
+						JsonArray arrSearchByTag = null;
+						continue;
+					}
 					JsonArray arrSearchByTag = searchObj.get("searchByTag").getAsJsonArray();
+					
 					for(int j = 0; j < arrSearchByArtist.size(); j++) {
 						artistsToSearch.add(arrSearchByArtist.get(j).getAsString());
 					}
@@ -131,7 +139,6 @@ public class ParseArgs {
 			}
 			if(args[i].equals("-output")) {
 				outputpath = args[i + 1];
-				System.out.println(outputpath);
 			}
 			if(args[i].equals("-order")) {
 				order = args[i + 1];
@@ -141,8 +148,8 @@ public class ParseArgs {
 				}
 			}
 			if(args[i].equals("-searchOutput")) {
+				doSearch = true;
 				searchOutputpath = args[i + 1];
-				System.out.println(searchOutputpath);
 			}
 		}
 		return true;

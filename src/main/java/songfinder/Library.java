@@ -53,11 +53,17 @@ public class Library {
 	}
 	
 	public JSONObject search(ArrayList<String> artistsToSearch, ArrayList<String> titlesToSearch, ArrayList<String> tagsToSearch, String searchOutputpath) throws JSONException {
-		lock.lockWrite();
+		
 		searchOutput = new JSONObject();
+//		System.out.println("searchByArtist" + "\n" + searchByArtist(artistsToSearch));
+		
 		searchOutput.put( "searchByArtist", searchByArtist(artistsToSearch));
 		searchOutput.put("searchByTag", searchByTag(tagsToSearch));
-		searchOutput.put( "searchByTitle", searchByTitle(titlesToSearch));
+//		lock.lockWrite();
+//		if(!tagsToSearch.isEmpty()) {
+			searchOutput.put( "searchByTitle", searchByTitle(titlesToSearch));
+//		}
+//		lock.unlockWrite();
 		Path outPath = Paths.get(searchOutputpath);
 		outPath.getParent().toFile().mkdirs();
 		try(BufferedWriter output = Files.newBufferedWriter(outPath)){
@@ -69,7 +75,7 @@ public class Library {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}     
-		lock.unlockWrite();
+		
 		return searchOutput;
 	}
 	
@@ -106,12 +112,14 @@ public class Library {
 	public JSONArray searchByArtist(ArrayList<String> artistsToSearch) throws JSONException {
 		JSONArray array2 = new JSONArray();
 		TreeSet<SongInfo> similarSongs;
+//		System.out.println(artistsToSearch);
 		for(String artist : artistsToSearch) {
 			JSONObject obj1 = new JSONObject();
 			JSONArray array3 = new JSONArray();
 			obj1.put("artist", artist);
 			similarSongs = new TreeSet<SongInfo>(new CompareByTrack_id());
 			if(linkedByArtist.containsKey(artist)) {
+//				System.out.println(linkedByArtist.containsKey(artist));
 				for(SongInfo song : linkedByArtist.get(artist)) {
 					for(String track_id : song.getSimilars()) {
 						if(byTrack_id.containsKey(track_id)) {
@@ -120,6 +128,7 @@ public class Library {
 					}
 				}
 			}
+//			System.out.println(similarSongs.size());
 			for(SongInfo si : similarSongs) {
 				if(si != null) {
 					JSONObject obj2 = new JSONObject();
@@ -127,11 +136,14 @@ public class Library {
 					obj2.put("trackId", si.getTrack_id());
 					obj2.put("title", si.getTitle());
 					array3.put(obj2);
+
 				}
 			}
 			obj1.put("similars", array3);
 			array2.put(obj1);
+//			System.out.println("印不出");
 		}
+//		System.out.println("aa");
 		return array2;
 	}
 	
