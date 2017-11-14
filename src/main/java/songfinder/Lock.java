@@ -35,7 +35,7 @@ public class Lock {
 	 * @return
 	 */
 	public synchronized boolean hasRead() {
-		return readingThreads.get(Thread.currentThread()) != null;
+		return readingThreads.containsKey(Thread.currentThread());
 	}
 	
 	/**
@@ -51,13 +51,7 @@ public class Lock {
 	 * @return
 	 */
 	public synchronized boolean hasWrite() {
-		if(writingThread == null) {
-			return false;
-		}
-		if(writingThread == Thread.currentThread()) {
-			return true;
-		}
-		return false;
+		return Thread.currentThread() == writingThread;
 	}
 	
 	/**
