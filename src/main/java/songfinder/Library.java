@@ -63,7 +63,6 @@ public class Library {
 	 * @throws JSONException
 	 */
 	public JSONObject search(ArrayList<String> artistsToSearch, ArrayList<String> titlesToSearch, ArrayList<String> tagsToSearch, String searchOutputpath) throws JSONException {
-		lock.lockWrite();
 		searchOutput = new JSONObject();
 		searchOutput.put( "searchByArtist", searchByArtist(artistsToSearch));
 		if(!tagsToSearch.isEmpty()) {
@@ -79,9 +78,8 @@ public class Library {
 				System.out.println("can't write to result json file.");
 			}
 		} catch (IOException e1) {
-			System.out.println("can't access outpath.");
+			System.out.println("can't access outpath." + outPath);
 		}     
-		lock.unlockWrite();
 		return searchOutput;
 	}
 	
