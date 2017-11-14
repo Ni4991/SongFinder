@@ -6,14 +6,14 @@ import java.io.FileNotFoundException;
 import org.json.JSONException;
 
 /**
- * Main class for SongFinder lab and projects.
+ * main class for SongFinder lab and projects.
  * @author nina luo
  *
  */
 public class Driver {
 	   
 	/**
-	 * Main method.
+	 * main method.
 	 * @param args
 	 */
 	public static void main(String[] args) {
