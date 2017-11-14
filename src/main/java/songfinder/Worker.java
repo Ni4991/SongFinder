@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashSet;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -39,12 +40,17 @@ public class Worker implements Runnable {
 			String artist = songObj.get("artist").getAsString();
 			String title = songObj.get("title").getAsString();
 			String track_id = songObj.get("track_id").getAsString();
-			JsonArray arr = songObj.get("tags").getAsJsonArray();
+			JsonArray arrTags = songObj.get("tags").getAsJsonArray();
+			JsonArray arrSimilars = songObj.get("similars").getAsJsonArray();
 			HashSet<String> tags = new HashSet<String>();
-			for(int j = 0; j < arr.size(); j++) {
-				tags.add(arr.get(j).getAsJsonArray().get(0).getAsString());
-			}   
-			SongInfo si = new SongInfo(artist, title, tags, track_id);
+			ArrayList<String> similars = new ArrayList<String>();
+			for(int j = 0; j < arrTags.size(); j++) {
+				tags.add(arrTags.get(j).getAsJsonArray().get(0).getAsString());
+			} 
+			for(int j = 0; j < arrSimilars.size(); j++) {
+				similars.add(arrSimilars.get(j).getAsJsonArray().get(0).getAsString());
+			} 
+			SongInfo si = new SongInfo(artist, title, tags, track_id, similars);
 			library.add(si);
 		} catch (FileNotFoundException e1) {
 			System.out.println("file not found.");

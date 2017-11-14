@@ -1,6 +1,8 @@
 package songfinder;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.TreeSet;
 
 /**
  * a class to hold info of a single song.
@@ -10,14 +12,19 @@ import java.util.HashSet;
 public class SongInfo {
 	private String artist, title, track_id;
 	private HashSet<String> tags;
+	private ArrayList<String> similars;
 	
-	public SongInfo(String artist, String title, HashSet<String> tags, String track_id) {
+	public SongInfo(String artist, String title, HashSet<String> tags, String track_id, ArrayList<String> similars) {
 		this.artist = artist;
 		this.title = title;
 		this.tags = tags;
 		this.track_id = track_id;
+		this.similars = similars;
 	}
 	
+	public ArrayList<String> getSimilars() {
+		return similars;
+	}
 	/**
 	 * return to artist's name.
 	 * @return

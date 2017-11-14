@@ -33,5 +33,6 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="C:/Program Files/Java/jre1.8.0_144/lib/java-json.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
