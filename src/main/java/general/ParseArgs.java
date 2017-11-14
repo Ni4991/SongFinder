@@ -1,4 +1,4 @@
-package songfinder;
+package general;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -40,24 +40,26 @@ public class ParseArgs {
 		artistsToSearch = new ArrayList<String>();
 		titlesToSearch = new ArrayList<String>();
 		tagsToSearch= new ArrayList<String>();
-		if(!checkArgs(args)) {
-			System.out.println("bad args.");
-			return;
-		}
-		LibraryBuilder lb = new LibraryBuilder(inputpath, nThreads, order);
-		lb.build(new File(inputpath));
-		lb.getWorkQueue().shutdown();
-		try {
-			lb.getWorkQueue().awaitTermination();
-		} catch (InterruptedException e) {
-			System.out.println("interrupted");
-		}
-		if(lb.getWorkQueue().isTerminated()) {
-			lb.getLibrary().saveToFile(outputpath, order);
-			if(doSearch) {
-				lb.getLibrary().search(artistsToSearch, titlesToSearch, tagsToSearch, searchOutputpath);
-			}
-		}		
+	}
+	
+	public String getSearchOutputpath() {
+		return searchOutputpath;
+	}
+	
+	public ArrayList<String> getTagsToSearch(){
+		return tagsToSearch;
+	}
+	
+	public ArrayList<String> getTitlesToSearch(){
+		return titlesToSearch;
+	}
+	
+	public ArrayList<String> getArtistsToSearch(){
+		return artistsToSearch;
+	}
+	
+	public boolean getDoSearch() {
+		return doSearch;
 	}
 	
 	/**
@@ -101,17 +103,23 @@ public class ParseArgs {
 					if(!laststr.contains("searchByArtist") && !laststr.contains("searchByTitle") && !laststr.contains("searchByTag")) {
 						return false;
 					}
-					JsonArray arrSearchByArtist = searchObj.get("searchByArtist").getAsJsonArray();
-					JsonArray arrSearchByTitle = searchObj.get("searchByTitle").getAsJsonArray();
-					JsonArray arrSearchByTag = searchObj.get("searchByTag").getAsJsonArray();
-					for(int j = 0; j < arrSearchByArtist.size(); j++) {
+					if(laststr.contains("searchByArtist")) {
+						JsonArray arrSearchByArtist = searchObj.get("searchByArtist").getAsJsonArray();
+						for(int j = 0; j < arrSearchByArtist.size(); j++) {
 						artistsToSearch.add(arrSearchByArtist.get(j).getAsString());
+						}
 					}
-					for(int j = 0; j < arrSearchByTitle.size(); j++) {
-						titlesToSearch.add(arrSearchByTitle.get(j).getAsString());
-					} 
-					for(int j = 0; j < arrSearchByTag.size(); j++) {
+					if(laststr.contains("searchByTitle")) {
+						JsonArray arrSearchByTitle = searchObj.get("searchByTitle").getAsJsonArray();
+						for(int j = 0; j < arrSearchByTitle.size(); j++) {
+							titlesToSearch.add(arrSearchByTitle.get(j).getAsString());
+						} 
+					}
+					if(laststr.contains("searchByTag")) {
+						JsonArray arrSearchByTag = searchObj.get("searchByTag").getAsJsonArray();
+						for(int j = 0; j < arrSearchByTag.size(); j++) {
 						tagsToSearch.add(arrSearchByTag.get(j).getAsString());
+						}
 					}
 				}
 			}

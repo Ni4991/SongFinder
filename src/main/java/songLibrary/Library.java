@@ -1,4 +1,4 @@
-package songfinder;
+package songLibrary;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -23,6 +23,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
+import concurrent.Lock;
+import general.SongInfo;
+
 import org.json.JSONException;  
 import org.json.JSONObject;  
 import org.json.JSONArray; 
@@ -64,6 +68,7 @@ public class Library {
 	 * @throws JSONException
 	 */
 	public JSONObject search(ArrayList<String> artistsToSearch, ArrayList<String> titlesToSearch, ArrayList<String> tagsToSearch, String searchOutputpath) throws JSONException {
+		lock.lockRead();
 		searchOutput = new JSONObject();
 		if(!artistsToSearch.isEmpty()) {
 			searchOutput.put( "searchByArtist", searchByArtist(artistsToSearch));
@@ -81,6 +86,7 @@ public class Library {
 		} catch (IOException e1) {
 			System.out.println("can't access outpath." + outPath);
 		}     
+		lock.unlockRead();
 		return searchOutput;
 	}
 	
@@ -267,12 +273,13 @@ public class Library {
 	 * @return
 	 */
 	public boolean saveToFile(String resultPath, String order) {
+		lock.lockRead();
 		Path outPath = Paths.get(resultPath);
 		outPath.getParent().toFile().mkdirs();
 		StringBuilder sb = new StringBuilder();
 		try(BufferedWriter output = Files.newBufferedWriter(outPath)){
+//			lock.lockRead();
 			if(order.equals("artist")) {
-				lock.lockWrite();	
 				Set<Entry<String, TreeSet<SongInfo>>> entrySet = byArtist.entrySet();
 				Iterator<Entry<String, TreeSet<SongInfo>>> it = entrySet.iterator();
 				while(it.hasNext()) {
@@ -285,7 +292,6 @@ public class Library {
 				output.write(sb.toString());
 			}     
 			else if(order.equals("title")) {
-				lock.lockWrite();
 				Set<Entry<String, TreeSet<SongInfo>>> entrySet = byTitle.entrySet();
 				Iterator<Entry<String, TreeSet<SongInfo>>> it = entrySet.iterator();
 				while(it.hasNext()) {
@@ -297,9 +303,7 @@ public class Library {
 				}
 				output.write(sb.toString());
 			}
-
 			else if(order.equals("tag")) {
-				lock.lockWrite();
 				StringBuilder sb2 = new StringBuilder();
 				Set<Entry<String, TreeSet<SongInfo>>> entrySet = byTag.entrySet();
 				Iterator<Entry<String, TreeSet<SongInfo>>> it = entrySet.iterator();
@@ -315,7 +319,7 @@ public class Library {
 				}
 				output.write(sb.toString());
 			}
-			lock.unlockWrite();
+			lock.unlockRead();
 		}catch(IOException e) {
 			System.out.print(e.getMessage());	
 		}

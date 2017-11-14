@@ -1,6 +1,8 @@
-package songfinder;
+package songLibrary;
 
 import java.util.Comparator;
+
+import general.SongInfo;
 
 /**
  * a class to sort by title.

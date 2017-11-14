@@ -1,4 +1,4 @@
-package songfinder;
+package concurrent;
 
 import java.util.LinkedList;
 

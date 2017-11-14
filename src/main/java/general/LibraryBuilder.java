@@ -1,4 +1,4 @@
-package songfinder;
+package general;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -9,6 +9,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Scanner;
+
+import concurrent.Lock;
+import concurrent.WorkQueue;
+import concurrent.Worker;
+import songLibrary.Library;
 
 /**
  * a class to add .json files to the song library.
@@ -46,9 +51,7 @@ public class LibraryBuilder {
 				}
 				String fileName = files[i].getName();
 				if(fileName.toLowerCase().endsWith(".json")) {
-					lock.lockWrite();
 					wq.execute(new Worker(this.getLibrary(), files[i]));
-					lock.unlockWrite();
 				}	
 			}
 		}

@@ -1,6 +1,8 @@
-package songfinder;
+package songLibrary;
 
 import java.util.Comparator;
+
+import general.SongInfo;
 
 /**
  * A class to sort by track_id.

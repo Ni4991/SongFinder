@@ -1,4 +1,4 @@
-package songfinder;
+package concurrent;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,6 +13,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
+
+import general.SongInfo;
+import songLibrary.Library;
 
 /**
  * a worker class for the workqueue.
