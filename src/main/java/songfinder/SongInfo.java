@@ -22,11 +22,16 @@ public class SongInfo {
 		this.similars = similars;
 	}
 	
+	/**
+	 * getter of all similar songs.
+	 * @return
+	 */
 	public ArrayList<String> getSimilars() {
 		return similars;
 	}
+	
 	/**
-	 * return to artist's name.
+	 * return artist's name.
 	 * @return
 	 */
 	public String getArtist() {
@@ -34,7 +39,7 @@ public class SongInfo {
 	}
 	
 	/**
-	 * return to the title.
+	 * return the title.
 	 * @return
 	 */
 	public String getTitle() {
@@ -42,7 +47,7 @@ public class SongInfo {
 	}
 	
 	/**
-	 * return to all the tags that song has.
+	 * return all the tags that song has.
 	 * @return
 	 */
 	public HashSet<String> getTags() {
@@ -50,7 +55,7 @@ public class SongInfo {
 	}
 	
 	/**
-	 * return to the track_id.
+	 * return the track_id.
 	 * @return
 	 */
 	public String getTrack_id() {
