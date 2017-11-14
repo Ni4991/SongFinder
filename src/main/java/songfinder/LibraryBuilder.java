@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Scanner;
 
 /**
- * A class to add .json files to the song library.
+ * a class to add .json files to the song library.
  * @author nina luo
  *
  */   
@@ -31,7 +31,7 @@ public class LibraryBuilder {
 	}
 	
 	/**
-	 * A method to find file in sub directories.
+	 * a method to find file in sub directories.
 	 * @param dir
 	 */
 	public void build(File dir) {
@@ -55,7 +55,7 @@ public class LibraryBuilder {
 	}
 	
 	/**
-	 * Return workqueue.
+	 * return workqueue.
 	 * @return
 	 */
 	public WorkQueue getWorkQueue() {
@@ -63,7 +63,7 @@ public class LibraryBuilder {
 	}
 	
 	/**
-	 * Get collection of all songs(sorted).
+	 * getter of the song library.
 	 * @return
 	 */
 	public Library getLibrary() {
