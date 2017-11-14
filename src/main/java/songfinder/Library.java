@@ -72,11 +72,7 @@ public class Library {
 		Path outPath = Paths.get(searchOutputpath);
 		outPath.getParent().toFile().mkdirs();
 		try(BufferedWriter output = Files.newBufferedWriter(outPath)){
-			try {
-				output.write(searchOutput.toString());
-			} catch (IOException e) {
-				System.out.println("can't write to result json file.");
-			}
+			output.write(searchOutput.toString());
 		} catch (IOException e1) {
 			System.out.println("can't access outpath." + outPath);
 		}     
@@ -274,7 +270,6 @@ public class Library {
 				lock.lockWrite();	
 				Set<Entry<String, TreeSet<SongInfo>>> entrySet = byArtist.entrySet();
 				Iterator<Entry<String, TreeSet<SongInfo>>> it = entrySet.iterator();
-				
 				while(it.hasNext()) {
 					Entry<String, TreeSet<SongInfo>> me = it.next();
 					TreeSet<SongInfo> value = me.getValue();
