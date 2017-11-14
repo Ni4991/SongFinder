@@ -27,7 +27,7 @@ import org.json.JSONObject;
 import org.json.JSONArray; 
 
 /**
- * A class to hold information of all songs.
+ * a class to hold information of all songs.
  * @author nina luo
  *
  */
@@ -35,8 +35,9 @@ public class Library {
 	private String order;
 	private Map<String, TreeSet<SongInfo>> byArtist, byTitle, byTag;
 	private HashMap<String, SongInfo> byTrack_id;
-	private HashMap<String, TreeSet<SongInfo>> linkedByArtist;
-	private HashMap<String, TreeSet<SongInfo>> linkedByTitle, linkedByTag;
+	private HashMap<String, TreeSet<SongInfo>> byArtistForSearch;
+	private HashMap<String, TreeSet<SongInfo>> byTitleForSearch;
+	private HashMap<String, TreeSet<SongInfo>> byTagForSearch;
 	private Lock lock;
 	private JSONObject searchOutput;
 	
@@ -47,23 +48,25 @@ public class Library {
 		byTitle = new TreeMap<String, TreeSet<SongInfo>>();
 		byTag = new TreeMap<String, TreeSet<SongInfo>>();
 		byTrack_id = new HashMap<String, SongInfo>();
-		linkedByArtist = new HashMap<String, TreeSet<SongInfo>>();
-		linkedByTitle = new HashMap<String, TreeSet<SongInfo>>();
-		linkedByTag = new HashMap<String, TreeSet<SongInfo>>();
+		byArtistForSearch = new HashMap<String, TreeSet<SongInfo>>();
+		byTitleForSearch = new HashMap<String, TreeSet<SongInfo>>();
+		byTagForSearch = new HashMap<String, TreeSet<SongInfo>>();
 	}
 	
+	/**
+	 * search method.
+	 * @param artistsToSearch
+	 * @param titlesToSearch
+	 * @param tagsToSearch
+	 * @param searchOutputpath
+	 * @return
+	 * @throws JSONException
+	 */
 	public JSONObject search(ArrayList<String> artistsToSearch, ArrayList<String> titlesToSearch, ArrayList<String> tagsToSearch, String searchOutputpath) throws JSONException {
-		
 		searchOutput = new JSONObject();
-//		System.out.println("searchByArtist" + "\n" + searchByArtist(artistsToSearch));
-		
 		searchOutput.put( "searchByArtist", searchByArtist(artistsToSearch));
 		searchOutput.put("searchByTag", searchByTag(tagsToSearch));
-//		lock.lockWrite();
-//		if(!tagsToSearch.isEmpty()) {
-			searchOutput.put( "searchByTitle", searchByTitle(titlesToSearch));
-//		}
-//		lock.unlockWrite();
+		searchOutput.put( "searchByTitle", searchByTitle(titlesToSearch));
 		Path outPath = Paths.get(searchOutputpath);
 		outPath.getParent().toFile().mkdirs();
 		try(BufferedWriter output = Files.newBufferedWriter(outPath)){
@@ -75,52 +78,59 @@ public class Library {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}     
-		
 		return searchOutput;
 	}
 	
+	/**
+	 * add method for search purpose.
+	 * @param si
+	 */
 	public void addForSearch(SongInfo si) {
 		byTrack_id.put(si.getTrack_id(), si);
-		if(linkedByArtist.containsKey(si.getArtist())) {
-			linkedByArtist.get(si.getArtist()).add(si);
+		if(byArtistForSearch.containsKey(si.getArtist())) {
+			byArtistForSearch.get(si.getArtist()).add(si);
 		}
 		else {
 			TreeSet<SongInfo> value = new TreeSet<SongInfo>(new CompareByTrack_id());
 			value.add(si);
-			linkedByArtist.put(si.getArtist(), value);
+			byArtistForSearch.put(si.getArtist(), value);
 		}
-		if(linkedByTitle.containsKey(si.getTitle())) {
-			linkedByTitle.get(si.getTitle()).add(si);
+		if(byTitleForSearch.containsKey(si.getTitle())) {
+			byTitleForSearch.get(si.getTitle()).add(si);
 		}
 		else {
 			TreeSet<SongInfo> value = new TreeSet<SongInfo>(new CompareByTrack_id());
 			value.add(si);
-			linkedByTitle.put(si.getTitle(), value);
+			byTitleForSearch.put(si.getTitle(), value);
 		}
 		for(String tag : si.getTags()) {
-			if(linkedByTag.containsKey(tag)) {
-				linkedByTag.get(tag).add(si);
+			if(byTagForSearch.containsKey(tag)) {
+				byTagForSearch.get(tag).add(si);
 			}
 			else {
 				TreeSet<SongInfo> value = new TreeSet<SongInfo>(new CompareByTrack_id());
 				value.add(si);
-				linkedByTag.put(tag, value);
+				byTagForSearch.put(tag, value);
 			}
 		}
 	}
 
+	/**
+	 * artist part of the search method.
+	 * @param artistsToSearch
+	 * @return
+	 * @throws JSONException
+	 */
 	public JSONArray searchByArtist(ArrayList<String> artistsToSearch) throws JSONException {
 		JSONArray array2 = new JSONArray();
 		TreeSet<SongInfo> similarSongs;
-//		System.out.println(artistsToSearch);
 		for(String artist : artistsToSearch) {
 			JSONObject obj1 = new JSONObject();
 			JSONArray array3 = new JSONArray();
 			obj1.put("artist", artist);
 			similarSongs = new TreeSet<SongInfo>(new CompareByTrack_id());
-			if(linkedByArtist.containsKey(artist)) {
-//				System.out.println(linkedByArtist.containsKey(artist));
-				for(SongInfo song : linkedByArtist.get(artist)) {
+			if(byArtistForSearch.containsKey(artist)) {
+				for(SongInfo song : byArtistForSearch.get(artist)) {
 					for(String track_id : song.getSimilars()) {
 						if(byTrack_id.containsKey(track_id)) {
 							similarSongs.add(byTrack_id.get(track_id));
@@ -128,7 +138,6 @@ public class Library {
 					}
 				}
 			}
-//			System.out.println(similarSongs.size());
 			for(SongInfo si : similarSongs) {
 				if(si != null) {
 					JSONObject obj2 = new JSONObject();
@@ -141,19 +150,23 @@ public class Library {
 			}
 			obj1.put("similars", array3);
 			array2.put(obj1);
-//			System.out.println("印不出");
 		}
-//		System.out.println("aa");
 		return array2;
 	}
 	
+	/**
+	 * tag part of the search method.
+	 * @param tagsToSearch
+	 * @return
+	 * @throws JSONException
+	 */
 	public JSONArray searchByTag(ArrayList<String> tagsToSearch) throws JSONException {
 		JSONArray array2 = new JSONArray();
 		for(String tag : tagsToSearch) {
 			JSONObject obj1 = new JSONObject();
 			JSONArray array3 = new JSONArray();
-			if(linkedByTag.containsKey(tag)) {
-				for(SongInfo song : linkedByTag.get(tag)) {
+			if(byTagForSearch.containsKey(tag)) {
+				for(SongInfo song : byTagForSearch.get(tag)) {
 					if(song != null) {
 						JSONObject obj2 = new JSONObject();
 						obj2.put("artist", song.getArtist());
@@ -170,6 +183,12 @@ public class Library {
 		return array2;
 	}
 
+	/**
+	 * title part of the search method.
+	 * @param titlesToSearch
+	 * @return
+	 * @throws JSONException
+	 */
 	public JSONArray searchByTitle(ArrayList<String> titlesToSearch) throws JSONException {
 		JSONArray array2 = new JSONArray();
 		TreeSet<SongInfo> similarSongs;
@@ -177,8 +196,8 @@ public class Library {
 			JSONObject obj1 = new JSONObject();
 			JSONArray array3 = new JSONArray();
 			similarSongs = new TreeSet<SongInfo>(new CompareByTrack_id());
-			if(linkedByTitle.containsKey(title)) {
-				for(SongInfo song : linkedByTitle.get(title)) {
+			if(byTitleForSearch.containsKey(title)) {
+				for(SongInfo song : byTitleForSearch.get(title)) {
 					for(String track_id : song.getSimilars()) {
 						if(byTrack_id.containsKey(track_id)) {
 							similarSongs.add(byTrack_id.get(track_id));
@@ -202,10 +221,8 @@ public class Library {
 		return array2;
 	}
 
-	
-
 	/**
-	 * Add each song object to three data structures.
+	 * add each song object to three data structures.
 	 * @param si
 	 */
 	public void add(SongInfo si) {
@@ -241,7 +258,7 @@ public class Library {
 	}
 	
 	/**
-	 * Save sorted songs to file.
+	 * save sorted songs to file.
 	 * @param resultPath
 	 * @param order
 	 * @return
@@ -302,5 +319,4 @@ public class Library {
 		}
 		return true;
 	}
-
 }
