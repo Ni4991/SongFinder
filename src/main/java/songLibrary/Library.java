@@ -17,6 +17,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.UUID;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -58,6 +59,47 @@ public class Library {
 		byTagForSearch = new HashMap<String, TreeSet<SongInfo>>();
 	}
 	
+	public synchronized String listToHtml(String type, String query) {
+		TreeSet<SongInfo> similarSongs = null;
+		System.out.println("type: " + type + ", query: " + query);
+		if(type.equals("Artist")) {
+			similarSongs = new TreeSet<SongInfo>(new CompareByTrack_id());
+			if(byArtistForSearch.containsKey(query)) {
+				for(SongInfo song : byArtistForSearch.get(query)) {
+					for(String track_id : song.getSimilars()) {
+						if(byTrack_id.containsKey(track_id)) {
+							similarSongs.add(byTrack_id.get(track_id));
+						}
+					}
+				}
+			}	
+		}
+		else if(type.equals("Song Title")) {
+			similarSongs = new TreeSet<SongInfo>(new CompareByTrack_id());
+			if(byTitleForSearch.containsKey(query)) {
+				for(SongInfo song : byTitleForSearch.get(query)) {
+					for(String track_id : song.getSimilars()) {
+						if(byTrack_id.containsKey(track_id)) {
+							similarSongs.add(byTrack_id.get(track_id));
+						}
+					}
+				}	
+			}
+		}
+		else if(type.equals("Tag")) {
+			similarSongs = byTag.get(query);
+		}
+		StringBuilder builder = new StringBuilder();
+		builder.append("<table border=1 border-spacing=3px>");
+//		builder.append("<tr><td colspan=2><b>" + query + "'s similar songs:</b></td></tr>");
+		builder.append("<tr><th>Artist</th><th>Song Title</th></tr>");
+		for(SongInfo song : similarSongs) {
+			builder.append("<tr><td>" + song.getArtist() + "</td><td>" + song.getTitle() + "</td></tr>");
+		}
+		builder.append("</table>");
+		return builder.toString();
+	}
+	
 	/**
 	 * search method.
 	 * @param artistsToSearch
@@ -83,8 +125,10 @@ public class Library {
 		outPath.getParent().toFile().mkdirs();
 		try(BufferedWriter output = Files.newBufferedWriter(outPath)){
 			output.write(searchOutput.toString());
+			System.out.println("writing in " + outPath);
 		} catch (IOException e1) {
-			System.out.println("can't access outpath." + outPath);
+			e1.printStackTrace();
+//			System.out.println("can't access outpath." + outPath);
 		}     
 		lock.unlockRead();
 		return searchOutput;
@@ -278,7 +322,6 @@ public class Library {
 		outPath.getParent().toFile().mkdirs();
 		StringBuilder sb = new StringBuilder();
 		try(BufferedWriter output = Files.newBufferedWriter(outPath)){
-//			lock.lockRead();
 			if(order.equals("artist")) {
 				Set<Entry<String, TreeSet<SongInfo>>> entrySet = byArtist.entrySet();
 				Iterator<Entry<String, TreeSet<SongInfo>>> it = entrySet.iterator();

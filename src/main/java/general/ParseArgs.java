@@ -73,31 +73,20 @@ public class ParseArgs {
 		}
 		for(int i = 0; i < args.length - 1; i++) {
 			if(args[i].equals("-searchInput")) {
-				doSearch = true;
-				BufferedReader reader = null;  
+				doSearch = true; 
 				String laststr = "";  
 				if(new File(args[i + 1]).isFile()) {
-					try {
-						FileInputStream fis = new FileInputStream(args[i + 1]);  
-						InputStreamReader isr = new InputStreamReader(fis, "UTF-8");  
-						reader = new BufferedReader(isr);  
+					try (FileReader fr = new FileReader(args[i + 1])) {
+						BufferedReader reader = new BufferedReader(fr);  
 						String str = null; 
 						while((str = reader.readLine()) != null){  
 							laststr += str;
 						}  
-				        reader.close();  
-						}
+				        reader.close(); 
+					}
 					catch(IOException e){  
 			            e.printStackTrace();  
-			        }finally{  
-			            if(reader != null){  
-			                try {  
-			                    reader.close();  
-			                } catch (IOException e) { 
-			                	e.printStackTrace();  
-			                }  
-			            }  
-			        } 
+			        }
 					JsonParser parser = new JsonParser();
 					searchObj = (JsonObject) parser.parse(laststr);
 					if(!laststr.contains("searchByArtist") && !laststr.contains("searchByTitle") && !laststr.contains("searchByTag")) {
