@@ -33,7 +33,7 @@ public class SearchSongServer {
 			}
         		
 			public void contextInitialized(ServletContextEvent sce) {
-				LibraryBuilder lb = new LibraryBuilder("input\\lastfm_subset", 2, "tag");
+				LibraryBuilder lb = new LibraryBuilder();
 				lb.build(new File("input\\lastfm_subset"));
 				lb.getWorkQueue().shutdown();
 				try {
