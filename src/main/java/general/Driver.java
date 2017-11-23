@@ -23,18 +23,10 @@ public class Driver {
 				System.out.println("bad args.");
 				return;
 			}
-			LibraryBuilder lb = new LibraryBuilder(pa.getInputpath(), pa.getnThreads(), pa.getOrder());
-			lb.build(new File(pa.getInputpath()));
-			lb.getWorkQueue().shutdown();
-			try {
-				lb.getWorkQueue().awaitTermination();
-			} catch (InterruptedException e) {
-				System.out.println("interrupted");
-			}
-			lb.getLibrary().saveToFile(pa.getOutputpath(), pa.getOrder());
-			if(pa.getDoSearch()) {
-				lb.getLibrary().search(pa.getArtistsToSearch(), pa.getTitlesToSearch(), pa.getTagsToSearch(), pa.getSearchOutputpath());
-			}
+			LibraryBuilder lb = new LibraryBuilder(pa.getInputpath(), pa.getnThreads(), pa.getOrder()
+					,pa.getOutputpath(), pa.getArtistsToSearch(), pa.getTitlesToSearch(), 
+					pa.getTagsToSearch(), pa.getDoSearch());
+			lb.build(new File(pa.getInputpath()));			
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}	
