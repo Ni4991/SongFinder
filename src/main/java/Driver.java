@@ -24,9 +24,9 @@ public class Driver {
 				return;
 			}
 			LibraryBuilder lb = new LibraryBuilder(pa.getInputpath(), pa.getnThreads(), pa.getOrder()
-					,pa.getOutputpath(), pa.getArtistsToSearch(), pa.getTitlesToSearch(), pa.getTagsToSearch());
-			lb.build(new File(pa.getInputpath()));
-			
+					,pa.getOutputpath(), pa.getArtistsToSearch(), pa.getTitlesToSearch(), 
+					pa.getTagsToSearch(), pa.getDoSearch());
+			lb.build(new File(pa.getInputpath()));			
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}	

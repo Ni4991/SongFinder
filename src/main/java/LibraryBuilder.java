@@ -28,16 +28,18 @@ public class LibraryBuilder {
 	private Library library;
 	private WorkQueue wq;
 	private Lock lock;
+	private boolean doSearch;
 	
 	public LibraryBuilder() {
 		inputpath = "input\\lastfm_subset";
 		outputpath = "output\\servlet";
 		order = "artist";
 		nThreads = 3;
+		lock = new Lock();
+		doSearch = false;
 	}
-	public LibraryBuilder (String inputpath, int nThreads, String order, String outputpath, 
-			ArrayList<String> artistsToSearch, ArrayList<String> titlesToSearch, 
-			ArrayList<String> tagsToSearch) {
+	
+	public LibraryBuilder (String inputpath, int nThreads, String order, String outputpath) {
 		this.order = order;
 		this.inputpath = inputpath;
 		this.outputpath = outputpath;
@@ -45,18 +47,45 @@ public class LibraryBuilder {
 		lock = new Lock();
 		library = new Library(order, lock);
 		wq = new WorkQueue(nThreads);
-		
+		doSearch = false;
+	}
+	
+	public LibraryBuilder (String inputpath, int nThreads, String order, String outputpath, 
+			ArrayList<String> artistsToSearch, ArrayList<String> titlesToSearch, 
+			ArrayList<String> tagsToSearch, boolean doSearch) {
+		this.order = order;
+		this.inputpath = inputpath;
+		this.outputpath = outputpath;
+		this.nThreads = nThreads;
+		lock = new Lock();
+		library = new Library(order, lock);
+		wq = new WorkQueue(nThreads);
+		this.doSearch = doSearch;
+	}
+	
+	public void build(File dir) {
+		parseFile(dir);
+		this.wq.shutdown();
+		try {
+			this.wq.awaitTermination();
+		} catch (InterruptedException e) {
+			System.out.println("interrupted");
+		}
+		this.library.saveToFile(outputpath, order);
+		if(doSearch) {
+			library.search(artistsToSearch, titlesToSearch, tagsToSearch, outputpath);
+		}
 	}
 	
 	/**
 	 * a method to find file in sub directories.
 	 * @param dir
 	 */
-	public void build(File dir) {
+	public void parseFile(File dir) {
 		File[] files = dir.listFiles();
 		for(int i = 0; i < files.length; i++) {
 			if(files[i].isDirectory()) {
-				build(files[i]);
+				parseFile(files[i]);
 			}
 			else {
 				if(!files[i].exists()) {
@@ -68,16 +97,12 @@ public class LibraryBuilder {
 				}	
 			}
 		}
-		getWorkQueue().shutdown();
-		try {
-			getWorkQueue().awaitTermination();
-		} catch (InterruptedException e) {
-			System.out.println("interrupted");
-		}
-		getLibrary().saveToFile(outputpath, order);
-		getLibrary().search(artistsToSearch, titlesToSearch, tagsToSearch, outputpath);
+		
+		
 	}
 	
+	
+
 	/**
 	 * return workqueue.
 	 * @return
