@@ -12,14 +12,13 @@ public class WorkQueue{
 	private final int nThreads;
 	private final PoolWorker[] threads;
 	private final LinkedList<Runnable> queue;
-	private volatile boolean hasShutdown, isTerminated;
+	private volatile boolean hasShutdown;
  
 	public WorkQueue(int nThreads){
         this.nThreads = nThreads;
         queue = new LinkedList<Runnable>();
         threads = new PoolWorker[nThreads];
         hasShutdown = false;
-        isTerminated = false;
  
         for(int i = 0; i < nThreads; i++) {
             threads[i] = new PoolWorker();
@@ -96,14 +95,5 @@ public class WorkQueue{
 				e.printStackTrace();
 			}
 		}
-		isTerminated = true;
-	}
-	
-	/**
-	 * get if the workqueue is terminated.
-	 * @return
-	 */
-	public boolean isTerminated() {
-		return isTerminated;
 	}
 }
