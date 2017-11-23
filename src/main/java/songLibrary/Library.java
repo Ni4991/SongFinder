@@ -38,12 +38,14 @@ import org.json.JSONArray;
  *
  */
 public class Library {
+	
 	private String order;
 	private Map<String, TreeSet<SongInfo>> byArtist, byTitle, byTag;
 	private HashMap<String, SongInfo> byTrack_id;
 	private HashMap<String, TreeSet<SongInfo>> byArtistForSearch;
 	private HashMap<String, TreeSet<SongInfo>> byTitleForSearch;
 	private HashMap<String, TreeSet<SongInfo>> byTagForSearch;
+	
 	private Lock lock;
 	private JSONObject searchOutput;
 	
@@ -59,6 +61,12 @@ public class Library {
 		byTagForSearch = new HashMap<String, TreeSet<SongInfo>>();
 	}
 	
+	/**
+	 * convert to html representation.
+	 * @param type
+	 * @param query
+	 * @return
+	 */
 	public synchronized String listToHtml(String type, String query) {
 		TreeSet<SongInfo> similarSongs = null;
 		System.out.println("type: " + type + ", query: " + query);
@@ -91,7 +99,6 @@ public class Library {
 		}
 		StringBuilder builder = new StringBuilder();
 		builder.append("<table border=1 border-spacing=3px>");
-//		builder.append("<tr><td colspan=2><b>" + query + "'s similar songs:</b></td></tr>");
 		builder.append("<tr><th>Artist</th><th>Song Title</th></tr>");
 		for(SongInfo song : similarSongs) {
 			builder.append("<tr><td>" + song.getArtist() + "</td><td>" + song.getTitle() + "</td></tr>");
@@ -128,7 +135,6 @@ public class Library {
 			System.out.println("writing in " + outPath);
 		} catch (IOException e1) {
 			e1.printStackTrace();
-//			System.out.println("can't access outpath." + outPath);
 		}     
 		lock.unlockRead();
 		return searchOutput;
