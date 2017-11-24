@@ -34,7 +34,7 @@ public class SearchSongServer {
         		
 			public void contextInitialized(ServletContextEvent sce) {
 				LibraryBuilder lb = new LibraryBuilder();
-				lb.build(new File("input\\lastfm_subset"));
+				lb.build();
 				lb.getWorkQueue().shutdown();
 				try {
 					lb.getWorkQueue().awaitTermination();
