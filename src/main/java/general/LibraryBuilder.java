@@ -63,8 +63,8 @@ public class LibraryBuilder {
 		this.doSearch = doSearch;
 	}
 	
-	public void build(File dir) {
-		parseFile(dir);
+	public void build() {
+		parseFile(new File(inputpath));
 		this.wq.shutdown();
 		try {
 			this.wq.awaitTermination();
