@@ -97,11 +97,7 @@ public class LibraryBuilder {
 				}	
 			}
 		}
-		
-		
 	}
-	
-	
 
 	/**
 	 * return workqueue.
