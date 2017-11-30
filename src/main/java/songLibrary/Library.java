@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
@@ -27,6 +28,10 @@ import com.google.gson.JsonParser;
 
 import concurrent.Lock;
 import general.SongInfo;
+import servlets.ArtistInfo;
+import servlets.CompareByAlpha;
+import servlets.CompareByPCount;
+import socket.HTTPFetcher;
 
 import org.json.JSONException;  
 import org.json.JSONObject;  
@@ -45,6 +50,8 @@ public class Library {
 	private HashMap<String, TreeSet<SongInfo>> byArtistForSearch;
 	private HashMap<String, TreeSet<SongInfo>> byTitleForSearch;
 	private HashMap<String, TreeSet<SongInfo>> byTagForSearch;
+//	private HashSet<String> allArtists;
+	private TreeSet<ArtistInfo> artistsByPCount;
 	
 	private Lock lock;
 	private JSONObject searchOutput;
@@ -62,8 +69,75 @@ public class Library {
 	}
 	//TODO:lock all methods.
 	
-	public Set<String> allArtists() {
-		return byArtist.keySet();
+	
+	public void test() {
+		System.out.println("all's size: " + byArtist.keySet().size());
+		for(String artist : byArtist.keySet()) {
+			System.out.println(artist);
+			String page = HTTPFetcher.download("ws.audioscrobbler.com", "/2.0/?method=artist.getinfo"
+					+ "&artist="+ artist +"&api_key=9162bc3f7439ff3d4258613b75d37287&format=json");
+			
+		}
+	}
+	
+	public void htmlArtists() {
+		lock.lockWrite();
+		String apiKey = "9162bc3f7439ff3d4258613b75d37287";
+		artistsByPCount = new TreeSet<ArtistInfo>(new CompareByPCount());
+//		artistsByPCount = new TreeSet<ArtistInfo>();
+		JsonObject toJson;
+		
+		for(String artist : byArtist.keySet()) {
+			System.out.println(artist);
+			String page = HTTPFetcher.download("ws.audioscrobbler.com", "/2.0/?method=artist.getinfo"
+					+ "&artist="+ artist +"&api_key=9162bc3f7439ff3d4258613b75d37287&format=json");
+			try(Scanner sc = new Scanner(page)){
+				while(sc.hasNextLine()) {
+					String line = sc.nextLine();
+					if(line.trim().length() == 0) {
+						line = sc.nextLine();
+						if(line.trim().startsWith("{\"artist\"")) {
+							System.out.println(line);
+							JsonParser parser = new JsonParser();
+							toJson = (JsonObject) parser.parse(line);
+							String art = toJson.getAsJsonObject("artist").get("name").getAsString();
+							JsonObject data = toJson.getAsJsonObject("artist");
+							data = data.getAsJsonObject("stats");
+							String playc = data.get("playcount").getAsString();
+							data = toJson.getAsJsonObject("artist");
+							data = data.getAsJsonObject("stats");
+							String lsnrs = data.get("listeners").getAsString();
+							data = toJson.getAsJsonObject("artist");
+							data = data.getAsJsonObject("bio");
+							String published = data.get("published").getAsString();
+							data = toJson.getAsJsonObject("artist");
+							data = data.getAsJsonObject("bio");
+							String summary = data.get("summary").getAsString();
+							data = toJson.getAsJsonObject("artist");
+							data = data.getAsJsonObject("bio");
+							String content = data.get("content").getAsString();
+							String bio = "published: " + published + "\n" + "summary: " + summary + "\n" + "content: " + content;
+						    int playcount = Integer.parseInt(playc);
+						    int listeners = Integer.parseInt(lsnrs);
+						    data = toJson.getAsJsonObject("artist");
+						    JsonArray dat = data.getAsJsonArray("image");
+						    String image = dat.get(0).getAsJsonObject().get("#text").getAsString();
+//						    artistsByAlpha.add(new ArtistInfo(art, bio, image, listeners, playcount));
+						    artistsByPCount.add(new ArtistInfo(art, bio, image, listeners, playcount));
+	
+						}
+					}
+				}
+			}
+//			System.out.println("got here1");//to delete
+		}	
+//		System.out.println("got here2");//to delete
+		for(ArtistInfo ai : artistsByPCount) {
+			System.out.println("name: " + ai.getName() + "\n" + "bio: " + ai.getBio() + "\n" 
+			+ "image: " + ai.getImage() + "\n" + "listeners: " + ai.getListeners() + "\n" 
+					+"playcount"+ ai.getPlaycount() + "\n");
+		}
+		lock.unlockWrite();
 	}
 	
 	public String viewAllArtists() {
@@ -123,10 +197,8 @@ public class Library {
 			ArrayList<String> titlesToSearch = new ArrayList<String>();
 			ArrayList<String> tagsToSearch = new ArrayList<String>();
 			titlesToSearch.add(song.getTitle());
-			builder.append("var text = " + search(artistsToSearch, titlesToSearch, tagsToSearch, "output/servlet")  
-					+"<tr><td>" + song.getArtist() + "</td>"
-					+ " <input type=\"hidden\" id=\"clickTitle\" value = text" 
-					+ "/><td onclick=\"displaySingle(text)\">" + song.getTitle()  + "</td></tr>");
+			builder.append("<tr><td>" + song.getArtist() + "</td>"
+					+ "<td>" + song.getTitle()  + "</td></tr>");
 		}
 		builder.append("</table>");
 		return builder.toString();
