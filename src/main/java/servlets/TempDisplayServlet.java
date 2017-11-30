@@ -34,7 +34,7 @@ public class TempDisplayServlet extends BaseServlet{
 		}	
 		builder.append("</table>");
 		return builder.toString();
-	}
+	} 
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		processRequest(request, response);
