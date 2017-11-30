@@ -73,7 +73,7 @@ public class Library {
 	public void test() {
 		System.out.println("all's size: " + byArtist.keySet().size());
 		for(String artist : byArtist.keySet()) {
-			System.out.println(artist);
+//			System.out.println(artist);
 			String page = HTTPFetcher.download("ws.audioscrobbler.com", "/2.0/?method=artist.getinfo"
 					+ "&artist="+ artist +"&api_key=9162bc3f7439ff3d4258613b75d37287&format=json");
 			
