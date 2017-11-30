@@ -60,7 +60,25 @@ public class Library {
 		byTitleForSearch = new HashMap<String, TreeSet<SongInfo>>();
 		byTagForSearch = new HashMap<String, TreeSet<SongInfo>>();
 	}
+	//TODO:lock all methods.
 	
+	public Set<String> allArtists() {
+		return byArtist.keySet();
+	}
+	
+	public String viewAllArtists() {
+//		StringBuilder builder = new StringBuilder();
+//		builder.append("<table border=1 border-spacing=3px>");
+		String str = "Artist name";
+//		builder.append("");
+		for(String artist : byArtist.keySet()) {
+//			builder.append(artist + "\n");
+			str += artist;
+		}
+//		builder.append("</p>");
+//		return builder.toString();
+		return str;
+	}
 	/**
 	 * convert to html representation.
 	 * @param type
@@ -101,7 +119,14 @@ public class Library {
 		builder.append("<table border=1 border-spacing=3px>");
 		builder.append("<tr><th>Artist</th><th>Song Title</th></tr>");
 		for(SongInfo song : similarSongs) {
-			builder.append("<tr><td>" + song.getArtist() + "</td><td>" + song.getTitle() + "</td></tr>");
+			ArrayList<String> artistsToSearch = new ArrayList<String>();
+			ArrayList<String> titlesToSearch = new ArrayList<String>();
+			ArrayList<String> tagsToSearch = new ArrayList<String>();
+			titlesToSearch.add(song.getTitle());
+			builder.append("var text = " + search(artistsToSearch, titlesToSearch, tagsToSearch, "output/servlet")  
+					+"<tr><td>" + song.getArtist() + "</td>"
+					+ " <input type=\"hidden\" id=\"clickTitle\" value = text" 
+					+ "/><td onclick=\"displaySingle(text)\">" + song.getTitle()  + "</td></tr>");
 		}
 		builder.append("</table>");
 		return builder.toString();
@@ -129,10 +154,12 @@ public class Library {
 			searchOutput.put( "searchByTitle", searchByTitle(titlesToSearch));
 		}
 		Path outPath = Paths.get(searchOutputpath);
+		System.out.println(searchOutputpath);
+		
+		System.out.println(outPath.toString());
 		outPath.getParent().toFile().mkdirs();
 		try(BufferedWriter output = Files.newBufferedWriter(outPath)){
 			output.write(searchOutput.toString());
-			System.out.println("writing in " + outPath);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}     
