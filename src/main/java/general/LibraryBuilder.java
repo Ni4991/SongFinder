@@ -28,17 +28,18 @@ public class LibraryBuilder {
 	private Library library;
 	private WorkQueue wq;
 	private Lock lock;
-	private boolean doSearch;
+	private boolean doSearch, doSave;
 	
 	public LibraryBuilder() {
-		inputpath = "input\\lastfm_subset";
-		outputpath = "output\\servlet";
+		inputpath = "input";
+		outputpath = "output";
 		order = "artist";
 		nThreads = 3;
 		lock = new Lock();
 		library = new Library(order, lock);
 		wq = new WorkQueue(nThreads);
 		doSearch = false;
+		doSave = false;
 	}
 	
 	public LibraryBuilder (String inputpath, int nThreads, String order, String outputpath) {
@@ -50,6 +51,7 @@ public class LibraryBuilder {
 		library = new Library(order, lock);
 		wq = new WorkQueue(nThreads);
 		doSearch = false;
+		doSave = true;
 	}
 	
 	public LibraryBuilder (String inputpath, int nThreads, String order, String outputpath, 
@@ -67,6 +69,7 @@ public class LibraryBuilder {
 		this.titlesToSearch = titlesToSearch;
 		this.tagsToSearch = tagsToSearch;
 		this.searchOutputpath = searchoutputpath;
+		doSave = true;
 	}
 	
 	public void build() {
@@ -77,10 +80,10 @@ public class LibraryBuilder {
 		} catch (InterruptedException e) {
 			System.out.println("interrupted");
 		}
-		this.library.saveToFile(outputpath, order);
+		if(doSave) {
+			this.library.saveToFile(outputpath, order);
+		}
 		if(doSearch) {
-			System.out.println("1");
-			System.out.println(artistsToSearch.size());
 			library.search(artistsToSearch, titlesToSearch, tagsToSearch, searchOutputpath);
 		}
 	}
