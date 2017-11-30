@@ -3,6 +3,11 @@ package servlets;
 import java.util.HashMap;
 import java.util.UUID;
 
+/**
+ * will implement later.
+ * @author nluo
+ *
+ */
 public class Data {
 
 	//maintain a map of name to UserInfo object
