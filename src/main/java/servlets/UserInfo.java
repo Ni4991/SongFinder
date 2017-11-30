@@ -3,7 +3,11 @@ package servlets;
 import java.util.ArrayList;
 import java.util.UUID;
 
-
+/**
+ * will implement later.
+ * @author nluo
+ *
+ */
 public class UserInfo {
 
 	private String name;
@@ -42,6 +46,4 @@ public class UserInfo {
 		builder.append("<form action=\"list?clear=\" method=\"post\"><input type=\"submit\" value=\"Clear\"></form>");
 		return builder.toString();
 	}
-	
-	
 }
