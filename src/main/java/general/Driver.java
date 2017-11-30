@@ -37,7 +37,7 @@ public class Driver {
 //			System.out.println(tmp2);
 //			lb.getLibrary().htmlArtists();//to delete
 //			System.out.println("hey success");
-			lb.getLibrary().htmlArtists();
+//			lb.getLibrary().htmlArtists();
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}	
