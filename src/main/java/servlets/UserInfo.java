@@ -9,7 +9,7 @@ import java.util.UUID;
  *
  */
 public class UserInfo {
-
+ 
 	private String name;
 	private ArrayList<String> searches;
 	
