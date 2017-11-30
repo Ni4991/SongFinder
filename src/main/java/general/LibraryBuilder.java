@@ -22,7 +22,7 @@ import songLibrary.Library;
  *
  */   
 public class LibraryBuilder {
-	private String inputpath, outputpath, order;
+	private String inputpath, outputpath, searchOutputpath, order;
 	private int nThreads;
 	private ArrayList<String> artistsToSearch, titlesToSearch, tagsToSearch;
 	private Library library;
@@ -54,7 +54,7 @@ public class LibraryBuilder {
 	
 	public LibraryBuilder (String inputpath, int nThreads, String order, String outputpath, 
 			ArrayList<String> artistsToSearch, ArrayList<String> titlesToSearch, 
-			ArrayList<String> tagsToSearch, boolean doSearch) {
+			ArrayList<String> tagsToSearch, boolean doSearch, String searchoutputpath) {
 		this.order = order;
 		this.inputpath = inputpath;
 		this.outputpath = outputpath;
@@ -66,6 +66,7 @@ public class LibraryBuilder {
 		this.artistsToSearch = artistsToSearch;
 		this.titlesToSearch = titlesToSearch;
 		this.tagsToSearch = tagsToSearch;
+		this.searchOutputpath = searchoutputpath;
 	}
 	
 	public void build() {
@@ -80,7 +81,7 @@ public class LibraryBuilder {
 		if(doSearch) {
 			System.out.println("1");
 			System.out.println(artistsToSearch.size());
-			library.search(artistsToSearch, titlesToSearch, tagsToSearch, outputpath);
+			library.search(artistsToSearch, titlesToSearch, tagsToSearch, searchOutputpath);
 		}
 	}
 	
