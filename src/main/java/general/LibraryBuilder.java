@@ -36,6 +36,8 @@ public class LibraryBuilder {
 		order = "artist";
 		nThreads = 3;
 		lock = new Lock();
+		library = new Library(order, lock);
+		wq = new WorkQueue(nThreads);
 		doSearch = false;
 	}
 	
@@ -61,6 +63,9 @@ public class LibraryBuilder {
 		library = new Library(order, lock);
 		wq = new WorkQueue(nThreads);
 		this.doSearch = doSearch;
+		this.artistsToSearch = artistsToSearch;
+		this.titlesToSearch = titlesToSearch;
+		this.tagsToSearch = tagsToSearch;
 	}
 	
 	public void build() {
@@ -73,6 +78,8 @@ public class LibraryBuilder {
 		}
 		this.library.saveToFile(outputpath, order);
 		if(doSearch) {
+			System.out.println("1");
+			System.out.println(artistsToSearch.size());
 			library.search(artistsToSearch, titlesToSearch, tagsToSearch, outputpath);
 		}
 	}
@@ -98,7 +105,7 @@ public class LibraryBuilder {
 			}
 		}
 	}
-
+	
 	/**
 	 * return workqueue.
 	 * @return
