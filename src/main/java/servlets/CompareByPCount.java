@@ -8,5 +8,4 @@ public class CompareByPCount implements Comparator<ArtistInfo>{
 	public int compare(ArtistInfo a1, ArtistInfo a2) {
 		return a1.getPlaycount() - a2.getPlaycount();
 	}
-
 }
