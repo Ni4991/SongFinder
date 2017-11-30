@@ -26,13 +26,7 @@ public class VerifyUserServlet extends BaseServlet {
 		String name = request.getParameter(NAME);
 		String type = request.getParameter(TYPE);
 		String query = request.getParameter(QUERY);
-		
-		
-//		if(name == null || name.trim().equals("")) {
-//			response.sendRedirect(response.encodeRedirectURL("/login?" + STATUS + "=" + ERROR));
-//			return;
-//		}
-		
+
 		HttpSession session = request.getSession();
 		session.setAttribute(NAME, name);
 		session.setAttribute(TYPE, type);
