@@ -50,7 +50,6 @@ public class Library {
 	private HashMap<String, TreeSet<SongInfo>> byArtistForSearch;
 	private HashMap<String, TreeSet<SongInfo>> byTitleForSearch;
 	private HashMap<String, TreeSet<SongInfo>> byTagForSearch;
-//	private HashSet<String> allArtists;
 	private TreeSet<ArtistInfo> artistsByPCount;
 	
 	private Lock lock;
@@ -67,26 +66,12 @@ public class Library {
 		byTitleForSearch = new HashMap<String, TreeSet<SongInfo>>();
 		byTagForSearch = new HashMap<String, TreeSet<SongInfo>>();
 	}
-	//TODO:lock all methods.
-	
-	
-	public void test() {
-		System.out.println("all's size: " + byArtist.keySet().size());
-		for(String artist : byArtist.keySet()) {
-//			System.out.println(artist);
-			String page = HTTPFetcher.download("ws.audioscrobbler.com", "/2.0/?method=artist.getinfo"
-					+ "&artist="+ artist +"&api_key=9162bc3f7439ff3d4258613b75d37287&format=json");
-			
-		}
-	}
 	
 	public void htmlArtists() {
 		lock.lockWrite();
 		String apiKey = "9162bc3f7439ff3d4258613b75d37287";
 		artistsByPCount = new TreeSet<ArtistInfo>(new CompareByPCount());
-//		artistsByPCount = new TreeSet<ArtistInfo>();
 		JsonObject toJson;
-		
 		for(String artist : byArtist.keySet()) {
 			System.out.println(artist);
 			String page = HTTPFetcher.download("ws.audioscrobbler.com", "/2.0/?method=artist.getinfo"
@@ -124,14 +109,11 @@ public class Library {
 						    String image = dat.get(0).getAsJsonObject().get("#text").getAsString();
 //						    artistsByAlpha.add(new ArtistInfo(art, bio, image, listeners, playcount));
 						    artistsByPCount.add(new ArtistInfo(art, bio, image, listeners, playcount));
-	
 						}
 					}
 				}
 			}
-//			System.out.println("got here1");//to delete
 		}	
-//		System.out.println("got here2");//to delete
 		for(ArtistInfo ai : artistsByPCount) {
 			System.out.println("name: " + ai.getName() + "\n" + "bio: " + ai.getBio() + "\n" 
 			+ "image: " + ai.getImage() + "\n" + "listeners: " + ai.getListeners() + "\n" 
@@ -140,19 +122,6 @@ public class Library {
 		lock.unlockWrite();
 	}
 	
-	public String viewAllArtists() {
-//		StringBuilder builder = new StringBuilder();
-//		builder.append("<table border=1 border-spacing=3px>");
-		String str = "Artist name";
-//		builder.append("");
-		for(String artist : byArtist.keySet()) {
-//			builder.append(artist + "\n");
-			str += artist;
-		}
-//		builder.append("</p>");
-//		return builder.toString();
-		return str;
-	}
 	/**
 	 * convert to html representation.
 	 * @param type
