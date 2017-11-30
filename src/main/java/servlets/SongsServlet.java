@@ -31,33 +31,47 @@ public class SongsServlet extends BaseServlet{
 		String type = (String) session.getAttribute(TYPE);
 
 		//user is not logged in, redirect to login page
-		if(name == null || !data.userExists(name)) {
-			response.sendRedirect(response.encodeRedirectURL("/login?" + STATUS + "=" + NOT_LOGGED_IN));
-			return;
-		}
+//		if(name == null || !data.userExists(name)) {
+//			response.sendRedirect(response.encodeRedirectURL("/login?" + STATUS + "=" + NOT_LOGGED_IN));
+//			return;
+//		}
 		
 		//if user has entered a new item add it to the list
 		
 		
 		
 		PrintWriter out = prepareResponse(response);
-		out.println(header("Search Result"));	
-		out.println("<p>type: " + type + ", query: " + query + ", name:" + name + "</p>");//delete later
-		out.println("<form action=\"list\" method=\"post\"> ");
+		out.println("<html><head><title>Result Page</title>"
+				+ "<script>" 		
+				+ "</script>"
+				+ "</head><body>");
+		
+		out.println("<p>You've got a song finder in me! Search for an artist, title or tag and "
+				+ "I will give you similar songs.</p><hr/>");
+		out.println("<p id = \"displayAllArtists\"></p>");
+		out.println("<p id = \"display\"></p>");
+		String str = library.viewAllArtists();
+		System.out.println(str);
+		
+//		out.println("<button onclick=\"alert('" + str+ "')\">View all artists</button>");
+//		out.println("<script type=\"text/javascript\">\r\n" + "function displaySingle(text)\r\n" + 
+//				"</script>");
+		out.println("<form action=\"verifyuser\" method=\"post\"> ");
 		out.println("<label>Search type: </label>" 
 					+ "<select name=\"type\">"
 					+ "<option value=\"Artist\">Artist</option>" 
 					+ "<option value=\"Song Title\">Song Title</option>" 
 					+ "<option value=\"Tag\">Tag</option>" 
 					+ "</select>" );
-		out.println("<input type=\"text\" name=\"query\"/>");
+		out.println("Query: <input type=\"text\" name=\"query\"/>");
 		out.println("<input type=\"submit\" value=\"Submit\"/>");
 		out.println("</form>");
 		out.println("<center>");		
-		out.println(library.listToHtml(type, name));
-		out.println("<br/><hr/>");
+		out.println(library.listToHtml(type, query));
+		out.println("<br/>");
 		out.println("</center>");
 		out.println(footer());
+		
 		
 	}
 }

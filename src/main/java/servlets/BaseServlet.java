@@ -12,11 +12,13 @@ public class BaseServlet extends HttpServlet{
 
 	public static final String LIBRARY = "library";
 	public static final String TYPE = "type";
-	public static final String QUERY = "library";
+	public static final String QUERY = "query";
 	public static final String SEARCH = "search";
 	public static final String NAME = "name";
 	public static final String UUID = "uuid";
 	public static final String DATA = "data";
+	public static final String ARTISTSBYALPHA = "artistsByAlpha";
+	public static final String ARTISTSBYPCOUNT = "artistsByPCount";
 	
 	public static final String CLEAR = "clear";
 	public static final String NOT_LOGGED_IN = "not_logged_in";
@@ -77,4 +79,5 @@ public class BaseServlet extends HttpServlet{
 	protected String getParameterValue(HttpServletRequest request, String key) {
 		return request.getParameter(key);
 	}
+
 }

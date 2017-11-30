@@ -3,6 +3,8 @@
 package servlets;
 
 import java.io.File;
+import java.util.Scanner;
+import java.util.TreeSet;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -10,7 +12,13 @@ import javax.servlet.ServletContextListener;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import general.LibraryBuilder;
+import socket.HTTPFetcher;
+import songLibrary.Library;
 
 
 public class SearchSongServer {
@@ -35,20 +43,17 @@ public class SearchSongServer {
 			public void contextInitialized(ServletContextEvent sce) {
 				LibraryBuilder lb = new LibraryBuilder();
 				lb.build();
-				lb.getWorkQueue().shutdown();
-				try {
-					lb.getWorkQueue().awaitTermination();
-				} catch (InterruptedException e) {
-					System.out.println("interrupted");
-				}
-				sce.getServletContext().setAttribute(BaseServlet.LIBRARY, lb.getLibrary());
+				Library library = lb.getLibrary();
+//				library.htmlArtists();
+				sce.getServletContext().setAttribute(BaseServlet.LIBRARY, library);
+//				sce.getServletContext().setAttribute(BaseServlet.ARTISTSBYALPHA, artistsByAlpha);
+//				sce.getServletContext().setAttribute(BaseServlet.ARTISTSBYPCOUNT, artistsByPCount);
 				sce.getServletContext().setAttribute(BaseServlet.DATA, new Data());
 			}
-        	
         });
-        servhandler.addServlet(LoginServlet.class, "/login");
+        servhandler.addServlet(SearchServlet.class, "/search");
         servhandler.addServlet(VerifyUserServlet.class, "/verifyuser");
-//        servhandler.addServlet(SearchServlet.class, "/search");
+        servhandler.addServlet(TempDisplayServlet.class, "/display");
         servhandler.addServlet(SongsServlet.class, "/list");
 
         //set the list of handlers for the server
@@ -57,7 +62,6 @@ public class SearchSongServer {
         //start the server
         server.start();
         server.join();
-
 	}
 }
 
