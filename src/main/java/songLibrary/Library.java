@@ -128,7 +128,8 @@ public class Library {
 	 * @param query
 	 * @return
 	 */
-	public synchronized String listToHtml(String type, String query) {
+	public String listToHtml(String type, String query) {
+		lock.lockWrite();
 		TreeSet<SongInfo> similarSongs = null;
 		System.out.println("type: " + type + ", query: " + query);
 		if(type.equals("Artist")) {
@@ -170,6 +171,7 @@ public class Library {
 					+ "<td>" + song.getTitle()  + "</td></tr>");
 		}
 		builder.append("</table>");
+		lock.unlockWrite();
 		return builder.toString();
 	}
 	
@@ -213,6 +215,7 @@ public class Library {
 	 * @param si
 	 */
 	public void addForSearch(SongInfo si) {
+		lock.lockWrite();
 		byTrack_id.put(si.getTrack_id(), si);
 		if(byArtistForSearch.containsKey(si.getArtist())) {
 			byArtistForSearch.get(si.getArtist()).add(si);
@@ -240,6 +243,7 @@ public class Library {
 				byTagForSearch.put(tag, value);
 			}
 		}
+		lock.unlockWrite();
 	}
 
 	/**
