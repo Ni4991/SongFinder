@@ -77,5 +77,4 @@ public class BaseServlet extends HttpServlet{
 	protected String getParameterValue(HttpServletRequest request, String key) {
 		return request.getParameter(key);
 	}
-
 }
