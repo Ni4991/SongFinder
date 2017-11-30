@@ -2,7 +2,6 @@ package servlets;
 
 import java.util.Comparator;
 
-
 public class CompareByAlpha implements Comparator<ArtistInfo>{
 
 	@Override
