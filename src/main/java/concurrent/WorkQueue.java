@@ -4,7 +4,7 @@ import java.util.LinkedList;
 
 /**
  * a threadpool class.
- * @author nina luo 
+ * @author nina luo
  *
  */
 public class WorkQueue{
