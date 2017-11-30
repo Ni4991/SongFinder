@@ -8,6 +8,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * a class to store style templete and invariables. 
+ * @author Administrator
+ *
+ */
 public class BaseServlet extends HttpServlet{
 
 	public static final String LIBRARY = "library";
@@ -79,5 +84,4 @@ public class BaseServlet extends HttpServlet{
 	protected String getParameterValue(HttpServletRequest request, String key) {
 		return request.getParameter(key);
 	}
-
 }
