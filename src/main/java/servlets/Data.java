@@ -33,7 +33,7 @@ public class Data {
 			userInfo.put(name, new UserInfo(name));
 		}
 	}
-
+ 
 	/*
 	 * For a given user, add a new todo.
 	 */
