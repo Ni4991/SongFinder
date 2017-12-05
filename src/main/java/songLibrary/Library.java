@@ -50,7 +50,8 @@ public class Library {
 	private HashMap<String, TreeSet<SongInfo>> byArtistForSearch;
 	private HashMap<String, TreeSet<SongInfo>> byTitleForSearch;
 	private HashMap<String, TreeSet<SongInfo>> byTagForSearch;
-	private TreeSet<ArtistInfo> artistsByPCount;
+	private TreeSet<ArtistInfo> artistsByPCount, artistsByAlpha;
+	private HashSet<String> copyArtists;
 	
 	private Lock lock;
 	private JSONObject searchOutput;
@@ -65,115 +66,169 @@ public class Library {
 		byArtistForSearch = new HashMap<String, TreeSet<SongInfo>>();
 		byTitleForSearch = new HashMap<String, TreeSet<SongInfo>>();
 		byTagForSearch = new HashMap<String, TreeSet<SongInfo>>();
-	}
-	
-	public void htmlArtists() {
-		lock.lockWrite();
-		String apiKey = "9162bc3f7439ff3d4258613b75d37287";
 		artistsByPCount = new TreeSet<ArtistInfo>(new CompareByPCount());
-		JsonObject toJson;
-		for(String artist : byArtist.keySet()) {
-			System.out.println(artist);
-			String page = HTTPFetcher.download("ws.audioscrobbler.com", "/2.0/?method=artist.getinfo"
-					+ "&artist="+ artist +"&api_key=9162bc3f7439ff3d4258613b75d37287&format=json");
-			try(Scanner sc = new Scanner(page)){
-				while(sc.hasNextLine()) {
-					String line = sc.nextLine();
-					if(line.trim().length() == 0) {
-						line = sc.nextLine();
-						if(line.trim().startsWith("{\"artist\"")) {
-							System.out.println(line);
-							JsonParser parser = new JsonParser();
-							toJson = (JsonObject) parser.parse(line);
-							String art = toJson.getAsJsonObject("artist").get("name").getAsString();
-							JsonObject data = toJson.getAsJsonObject("artist");
-							data = data.getAsJsonObject("stats");
-							String playc = data.get("playcount").getAsString();
-							data = toJson.getAsJsonObject("artist");
-							data = data.getAsJsonObject("stats");
-							String lsnrs = data.get("listeners").getAsString();
-							data = toJson.getAsJsonObject("artist");
-							data = data.getAsJsonObject("bio");
-							String published = data.get("published").getAsString();
-							data = toJson.getAsJsonObject("artist");
-							data = data.getAsJsonObject("bio");
-							String summary = data.get("summary").getAsString();
-							data = toJson.getAsJsonObject("artist");
-							data = data.getAsJsonObject("bio");
-							String content = data.get("content").getAsString();
-							String bio = "published: " + published + "\n" + "summary: " + summary + "\n" + "content: " + content;
-						    int playcount = Integer.parseInt(playc);
-						    int listeners = Integer.parseInt(lsnrs);
-						    data = toJson.getAsJsonObject("artist");
-						    JsonArray dat = data.getAsJsonArray("image");
-						    String image = dat.get(0).getAsJsonObject().get("#text").getAsString();
-//						    artistsByAlpha.add(new ArtistInfo(art, bio, image, listeners, playcount));
-						    artistsByPCount.add(new ArtistInfo(art, bio, image, listeners, playcount));
-						}
-					}
-				}
-			}
-		}	
-		for(ArtistInfo ai : artistsByPCount) {
-			System.out.println("name: " + ai.getName() + "\n" + "bio: " + ai.getBio() + "\n" 
-			+ "image: " + ai.getImage() + "\n" + "listeners: " + ai.getListeners() + "\n" 
-					+"playcount"+ ai.getPlaycount() + "\n");
-		}
-		lock.unlockWrite();
+		artistsByAlpha = new TreeSet<ArtistInfo>(new CompareByAlpha());
+		copyArtists = new HashSet<String>();
 	}
+	//TODO:lock all methods.
 	
-	/**
-	 * convert to html representation.
-	 * @param type
-	 * @param query
-	 * @return
-	 */
-	public String listToHtml(String type, String query) {
+	
+	public String searchToHtml(String type, String partial) {
 		lock.lockWrite();
 		TreeSet<SongInfo> similarSongs = null;
-		System.out.println("type: " + type + ", query: " + query);
+		HashSet<String> containsQ = null;
 		if(type.equals("Artist")) {
 			similarSongs = new TreeSet<SongInfo>(new CompareByTrack_id());
-			if(byArtistForSearch.containsKey(query)) {
-				for(SongInfo song : byArtistForSearch.get(query)) {
+			containsQ = new HashSet<String>();
+			for(String art : byArtistForSearch.keySet()) {
+				if(art.toLowerCase().contains(partial.toLowerCase())) {
+					containsQ.add(art);
+				}
+			}
+			for(String art : containsQ){
+				for(SongInfo song : byArtistForSearch.get(art)) {
+					ArrayList<String> newSimilars = new ArrayList<String>();
+					for(String simi : song.getSimilars()) {
+						newSimilars.add(simi);
+					}
 					for(String track_id : song.getSimilars()) {
 						if(byTrack_id.containsKey(track_id)) {
 							similarSongs.add(byTrack_id.get(track_id));
 						}
 					}
 				}
-			}	
+			}
 		}
 		else if(type.equals("Song Title")) {
 			similarSongs = new TreeSet<SongInfo>(new CompareByTrack_id());
-			if(byTitleForSearch.containsKey(query)) {
-				for(SongInfo song : byTitleForSearch.get(query)) {
-					for(String track_id : song.getSimilars()) {
+			containsQ = new HashSet<String>();
+			for(String titl : byTitleForSearch.keySet()) {
+				if(titl.toLowerCase().contains(partial.toLowerCase())) {
+					containsQ.add(titl);
+				}
+			}
+			for(String titl : containsQ){
+				for(SongInfo song : byTitleForSearch.get(titl)) {
+					ArrayList<String> newSimilars = new ArrayList<String>();
+					for(String simi : song.getSimilars()) {
+						newSimilars.add(simi);
+					}
+					for(String track_id : newSimilars) {
 						if(byTrack_id.containsKey(track_id)) {
 							similarSongs.add(byTrack_id.get(track_id));
 						}
 					}
-				}	
+				}
 			}
 		}
 		else if(type.equals("Tag")) {
-			similarSongs = byTag.get(query);
+			similarSongs = new TreeSet<SongInfo>(new CompareByTrack_id());
+			containsQ = new HashSet<String>();
+			for(String tg : byTag.keySet()) {
+				if(tg.contains(partial.toUpperCase())) {
+					containsQ.add(tg);
+				}
+			}
+			for(String tg : containsQ){
+				for(SongInfo song : byTag.get(tg)) {
+					ArrayList<String> newSimilars = new ArrayList<String>();
+					for(String simi : song.getSimilars()) {
+						newSimilars.add(simi);
+					}
+					for(String track_id : newSimilars) {
+						if(byTrack_id.containsKey(track_id)) {
+							similarSongs.add(byTrack_id.get(track_id));
+						}
+					}
+				}
+			}
 		}
 		StringBuilder builder = new StringBuilder();
-		builder.append("<table border=1 border-spacing=3px>");
-		builder.append("<tr><th>Artist</th><th>Song Title</th></tr>");
-		for(SongInfo song : similarSongs) {
-			ArrayList<String> artistsToSearch = new ArrayList<String>();
+		builder.append("<table id = \"table1\" border=1 border-spacing=3px>");
+		builder.append("<thead><tr><th>Artist</th><th>Song Title</th></tr></thead><tbody id = \"table2\">");
+		for(SongInfo si : similarSongs) {
+			SongInfo song = new SongInfo(si.getArtist(), si.getTitle(), null, si.getTrack_id(), null);
+			ArrayList<String> newSimilars = new ArrayList<String>();
+			for(String simi : si.getSimilars()) {
+				newSimilars.add(simi);
+			}
 			ArrayList<String> titlesToSearch = new ArrayList<String>();
-			ArrayList<String> tagsToSearch = new ArrayList<String>();
 			titlesToSearch.add(song.getTitle());
 			builder.append("<tr><td>" + song.getArtist() + "</td>"
-					+ "<td>" + song.getTitle()  + "</td></tr>");
+					+ "<td><details>\r\n" + 
+					"    <summary>"+ song.getTitle() +"</summary>\r\n" + 
+					"        <p>details: </p>\r\n" + 
+					"        <ul>\r\n" + 
+					"            <li>artist name: " + song.getArtist() + "</li>\r\n" + 
+					"            <li>title: "+ song.getTitle() + "</li>\r\n" + 
+					"            <li>similar songs: " + newSimilars + "</li>\r\n" + 
+					"        </ul>\r\n" + 
+					"    </details> " + "</td></tr>");
 		}
 		builder.append("</table>");
 		lock.unlockWrite();
 		return builder.toString();
 	}
+	
+	public String htmlByAlpha() {
+		lock.lockRead();
+		StringBuilder builder = new StringBuilder();
+		builder.append("<table id = \"table1\" align=\"center\" border=1 border-spacing=3px>");
+		builder.append("<thead><tr><th>Artist</th><th>Play count</th></tr></thead><tbody id = \"table2\">");
+		for(ArtistInfo ainfo : artistsByAlpha) {
+			ArtistInfo ai = new ArtistInfo(ainfo.getName(), ainfo.getBio(), ainfo.getImage(), ainfo.getListeners(), ainfo.getPlaycount());
+			builder.append("<tr><td><details>\r\n" + 
+					"    <summary>"+ ai.getName() +"</summary>\r\n" + 
+					"        <p>details: </p>\r\n" + 
+					"        <ul>\r\n" + 
+					"		 	 <li><img src=\"" + ai.getImage() + "\"alt=\"img\" />" +
+					"            <li>artist name: " + ai.getName() + "</li>\r\n" + 
+					"            <li>play count: "+ ai.getPlaycount() + "</li>\r\n" + 
+					"            <li>listeners: " + ai.getListeners() + "</li>\r\n" + 
+					"            <li>bio: " + ai.getBio() + "</li>\r\n" + 
+					"        </ul>\r\n" + 
+					"    </details> " + "</td><td>" + ai.getPlaycount() + "</td>"
+					+ "</tr>");
+		}
+		builder.append("</table>");
+		builder.append("<span id=\"spanPre\">Previous</span> <span id=\"spanNext\"> Next</span> "
+				+ " Page <span id=\"spanPageNum\"></span> of <span id=\"spanTotalPage\"></span> Pages");
+		lock.unlockRead();
+		return builder.toString();
+	}
+	
+	public String htmlByPCount() {
+		lock.lockRead();
+		StringBuilder builder = new StringBuilder();
+		builder.append("<table id = \"table1\" align=\"center\" border=1 border-spacing=3px>");
+		builder.append("<thead><tr><th>Play count</th><th>Artist</th></tr></thead><tbody id = \"table2\">");
+		for(ArtistInfo ainfo : artistsByPCount) {
+			ArtistInfo ai = new ArtistInfo(ainfo.getName(), ainfo.getBio(), ainfo.getImage(), ainfo.getListeners(), ainfo.getPlaycount());
+			builder.append("<tr><td>" + ai.getPlaycount() + "</td>"
+					+ "<td><details>\r\n" + 
+					"    <summary>"+ ai.getName() +"</summary>\r\n" + 
+					"        <p>details: </p>\r\n" + 
+					"        <ul>\r\n" + 
+					"		 	 <li><img src=\"" + ai.getImage() + "\"alt=\"img\" />" +
+					"            <li>artist name: " + ai.getName() + "</li>\r\n" + 
+					"            <li>play count: "+ ai.getPlaycount() + "</li>\r\n" + 
+					"            <li>listeners: " + ai.getListeners() + "</li>\r\n" + 
+					"            <li>bio: " + ai.getBio() + "</li>\r\n" + 
+					"        </ul>\r\n" + 
+					"    </details> " + "</td></tr>");
+		}
+		builder.append("<span id=\"spanPre\">Previous</span> <span id=\"spanNext\"> Next</span> "
+				+ " Page <span id=\"spanPageNum\"></span> of <span id=\"spanTotalPage\"></span> Pages");
+		lock.unlockRead();
+		return builder.toString();
+	}
+	
+	/**
+	 * convert search result to html representation.
+	 * @param type
+	 * @param query
+	 * @return
+	 */
 	
 	/**
 	 * search method.
@@ -197,9 +252,6 @@ public class Library {
 			searchOutput.put( "searchByTitle", searchByTitle(titlesToSearch));
 		}
 		Path outPath = Paths.get(searchOutputpath);
-		System.out.println(searchOutputpath);
-		
-		System.out.println(outPath.toString());
 		outPath.getParent().toFile().mkdirs();
 		try(BufferedWriter output = Files.newBufferedWriter(outPath)){
 			output.write(searchOutput.toString());
@@ -215,7 +267,6 @@ public class Library {
 	 * @param si
 	 */
 	public void addForSearch(SongInfo si) {
-		lock.lockWrite();
 		byTrack_id.put(si.getTrack_id(), si);
 		if(byArtistForSearch.containsKey(si.getArtist())) {
 			byArtistForSearch.get(si.getArtist()).add(si);
@@ -243,7 +294,6 @@ public class Library {
 				byTagForSearch.put(tag, value);
 			}
 		}
-		lock.unlockWrite();
 	}
 
 	/**
@@ -262,14 +312,19 @@ public class Library {
 			similarSongs = new TreeSet<SongInfo>(new CompareByTrack_id());
 			if(byArtistForSearch.containsKey(artist)) {
 				for(SongInfo song : byArtistForSearch.get(artist)) {
-					for(String track_id : song.getSimilars()) {
+					ArrayList<String> newSimilars = new ArrayList<String>();
+					for(String simi : song.getSimilars()) {
+						newSimilars.add(simi);
+					}
+					for(String track_id : newSimilars) {
 						if(byTrack_id.containsKey(track_id)) {
 							similarSongs.add(byTrack_id.get(track_id));
 						}
 					}
 				}
 			}
-			for(SongInfo si : similarSongs) {
+			for(SongInfo song : similarSongs) {
+				SongInfo si = new SongInfo(song.getArtist(), song.getTitle(), null, song.getTrack_id(), null);
 				if(si != null) {
 					JSONObject obj2 = new JSONObject();
 					obj2.put("artist", si.getArtist());
@@ -298,11 +353,12 @@ public class Library {
 			JSONArray array3 = new JSONArray();
 			if(byTagForSearch.containsKey(tag)) {
 				for(SongInfo song : byTagForSearch.get(tag)) {
+					SongInfo si = new SongInfo(song.getArtist(), song.getTitle(), null, song.getTrack_id(), null);
 					if(song != null) {
 						JSONObject obj2 = new JSONObject();
-						obj2.put("artist", song.getArtist());
-						obj2.put("trackId", song.getTrack_id());
-						obj2.put("title", song.getTitle());
+						obj2.put("artist", si.getArtist());
+						obj2.put("trackId", si.getTrack_id());
+						obj2.put("title", si.getTitle());
 						array3.put(obj2);
 					}
 				}	
@@ -329,13 +385,18 @@ public class Library {
 			similarSongs = new TreeSet<SongInfo>(new CompareByTrack_id());
 			if(byTitleForSearch.containsKey(title)) {
 				for(SongInfo song : byTitleForSearch.get(title)) {
-					for(String track_id : song.getSimilars()) {
+					ArrayList<String> newSimilars = new ArrayList<String>();
+					for(String simi : song.getSimilars()) {
+						newSimilars.add(simi);
+					}
+					for(String track_id : newSimilars) {
 						if(byTrack_id.containsKey(track_id)) {
 							similarSongs.add(byTrack_id.get(track_id));
 						}
 					}
 				}
-				for(SongInfo si : similarSongs) {
+				for(SongInfo song : similarSongs) {
+					SongInfo si = new SongInfo(song.getArtist(), song.getTitle(), null, song.getTrack_id(), null);
 					if(si != null) {
 						JSONObject obj2 = new JSONObject();
 						obj2.put("artist", si.getArtist());
@@ -352,12 +413,26 @@ public class Library {
 		return array2;
 	}
 
+	public void addArtistInfo(ArtistInfo ai) {
+		lock.lockWrite();
+		artistsByPCount.add(ai);
+		artistsByAlpha.add(ai);
+		lock.unlockWrite();
+	}
+	
+	public HashSet<String> getCopyArtists() {
+		for(String artist : byArtist.keySet()) {
+			copyArtists.add(artist);
+		}
+		return copyArtists;
+	}
+	
 	/**
 	 * add each song object to three data structures.
 	 * @param si
 	 */
 	public void add(SongInfo si) {
-		lock.lockWrite();
+		lock.lockWrite();	
 		if(byArtist.containsKey(si.getArtist())) {
 			byArtist.get(si.getArtist()).add(si);
 		}
@@ -446,4 +521,7 @@ public class Library {
 		}
 		return true;
 	}
+
+
+
 }
