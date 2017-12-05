@@ -54,7 +54,6 @@ public class Library {
 	private HashSet<String> copyArtists;
 	
 	private Lock lock;
-	private JSONObject searchOutput;
 	
 	public Library(String order, Lock lock) {
 		this.order = order;
@@ -93,7 +92,17 @@ public class Library {
 					}
 					for(String track_id : song.getSimilars()) {
 						if(byTrack_id.containsKey(track_id)) {
-							similarSongs.add(byTrack_id.get(track_id));
+							SongInfo src = byTrack_id.get(track_id);
+							HashSet<String> newTags = new HashSet<String>();
+							for(String tag : src.getTags()) {
+								newTags.add(tag);
+							}
+							ArrayList<String> newSimi = new ArrayList<String>();
+							for(String simi : song.getSimilars()) {
+								newSimi.add(simi);
+							}
+							SongInfo sinfo = new SongInfo(src.getArtist(), src.getTitle(), newTags, src.getTrack_id(), newSimi);
+							similarSongs.add(sinfo);
 						}
 					}
 				}
@@ -115,7 +124,19 @@ public class Library {
 					}
 					for(String track_id : newSimilars) {
 						if(byTrack_id.containsKey(track_id)) {
-							similarSongs.add(byTrack_id.get(track_id));
+							if(byTrack_id.containsKey(track_id)) {
+								SongInfo src = byTrack_id.get(track_id);
+								HashSet<String> newTags = new HashSet<String>();
+								for(String tag : src.getTags()) {
+									newTags.add(tag);
+								}
+								ArrayList<String> newSimi = new ArrayList<String>();
+								for(String simi : song.getSimilars()) {
+									newSimi.add(simi);
+								}
+								SongInfo sinfo = new SongInfo(src.getArtist(), src.getTitle(), newTags, src.getTrack_id(), newSimi);
+								similarSongs.add(sinfo);
+							}
 						}
 					}
 				}
@@ -137,7 +158,17 @@ public class Library {
 					}
 					for(String track_id : newSimilars) {
 						if(byTrack_id.containsKey(track_id)) {
-							similarSongs.add(byTrack_id.get(track_id));
+							SongInfo src = byTrack_id.get(track_id);
+							HashSet<String> newTags = new HashSet<String>();
+							for(String tag : src.getTags()) {
+								newTags.add(tag);
+							}
+							ArrayList<String> newSimi = new ArrayList<String>();
+							for(String simi : song.getSimilars()) {
+								newSimi.add(simi);
+							}
+							SongInfo sinfo = new SongInfo(src.getArtist(), src.getTitle(), newTags, src.getTrack_id(), newSimi);
+							similarSongs.add(sinfo);
 						}
 					}
 				}
@@ -241,15 +272,27 @@ public class Library {
 	 */
 	public JSONObject search(ArrayList<String> artistsToSearch, ArrayList<String> titlesToSearch, ArrayList<String> tagsToSearch, String searchOutputpath) throws JSONException {
 		lock.lockRead();
-		searchOutput = new JSONObject();
+		JSONObject searchOutput = new JSONObject();
 		if(!artistsToSearch.isEmpty()) {
-			searchOutput.put( "searchByArtist", searchByArtist(artistsToSearch));
+			ArrayList<String> aToSearch = new ArrayList<String>();
+			for(String artist : artistsToSearch) {
+				aToSearch.add(artist);
+			}
+			searchOutput.put("searchByArtist", searchByArtist(aToSearch));
 		}
 		if(!tagsToSearch.isEmpty()) {
-			searchOutput.put("searchByTag", searchByTag(tagsToSearch));
+			ArrayList<String> tgToSearch = new ArrayList<String>();
+			for(String tag : tagsToSearch) {
+				tgToSearch.add(tag);
+			}
+			searchOutput.put("searchByTag", searchByTag(tgToSearch));
 		}
 		if(!titlesToSearch.isEmpty()) {
-			searchOutput.put( "searchByTitle", searchByTitle(titlesToSearch));
+			ArrayList<String> tToSearch = new ArrayList<String>();
+			for(String t : titlesToSearch) {
+				tToSearch.add(t);
+			}
+			searchOutput.put( "searchByTitle", searchByTitle(tToSearch));
 		}
 		Path outPath = Paths.get(searchOutputpath);
 		outPath.getParent().toFile().mkdirs();
@@ -304,12 +347,11 @@ public class Library {
 	 */
 	public JSONArray searchByArtist(ArrayList<String> artistsToSearch) throws JSONException {
 		JSONArray array2 = new JSONArray();
-		TreeSet<SongInfo> similarSongs;
 		for(String artist : artistsToSearch) {
 			JSONObject obj1 = new JSONObject();
 			JSONArray array3 = new JSONArray();
 			obj1.put("artist", artist);
-			similarSongs = new TreeSet<SongInfo>(new CompareByTrack_id());
+			TreeSet<SongInfo> similarSongs = new TreeSet<SongInfo>(new CompareByTrack_id());
 			if(byArtistForSearch.containsKey(artist)) {
 				for(SongInfo song : byArtistForSearch.get(artist)) {
 					ArrayList<String> newSimilars = new ArrayList<String>();
@@ -318,7 +360,17 @@ public class Library {
 					}
 					for(String track_id : newSimilars) {
 						if(byTrack_id.containsKey(track_id)) {
-							similarSongs.add(byTrack_id.get(track_id));
+							SongInfo src = byTrack_id.get(track_id);
+							HashSet<String> newTags = new HashSet<String>();
+							for(String tg : src.getTags()) {
+								newTags.add(tg);
+							}
+							ArrayList<String> newSimi = new ArrayList<String>();
+							for(String simi : song.getSimilars()) {
+								newSimi.add(simi);
+							}
+							SongInfo sinfo = new SongInfo(src.getArtist(), src.getTitle(), newTags, src.getTrack_id(), newSimi);
+							similarSongs.add(sinfo);
 						}
 					}
 				}
@@ -378,11 +430,10 @@ public class Library {
 	 */
 	public JSONArray searchByTitle(ArrayList<String> titlesToSearch) throws JSONException {
 		JSONArray array2 = new JSONArray();
-		TreeSet<SongInfo> similarSongs;
 		for(String title : titlesToSearch) {
 			JSONObject obj1 = new JSONObject();
 			JSONArray array3 = new JSONArray();
-			similarSongs = new TreeSet<SongInfo>(new CompareByTrack_id());
+			TreeSet<SongInfo> similarSongs = new TreeSet<SongInfo>(new CompareByTrack_id());
 			if(byTitleForSearch.containsKey(title)) {
 				for(SongInfo song : byTitleForSearch.get(title)) {
 					ArrayList<String> newSimilars = new ArrayList<String>();
@@ -391,7 +442,17 @@ public class Library {
 					}
 					for(String track_id : newSimilars) {
 						if(byTrack_id.containsKey(track_id)) {
-							similarSongs.add(byTrack_id.get(track_id));
+							SongInfo src = byTrack_id.get(track_id);
+							HashSet<String> newTags = new HashSet<String>();
+							for(String tg : src.getTags()) {
+								newTags.add(tg);
+							}
+							ArrayList<String> newSimi = new ArrayList<String>();
+							for(String simi : song.getSimilars()) {
+								newSimi.add(simi);
+							}
+							SongInfo sinfo = new SongInfo(src.getArtist(), src.getTitle(), newTags, src.getTrack_id(), newSimi);
+							similarSongs.add(sinfo);
 						}
 					}
 				}
@@ -521,7 +582,4 @@ public class Library {
 		}
 		return true;
 	}
-
-
-
 }
