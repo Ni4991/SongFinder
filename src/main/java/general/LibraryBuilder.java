@@ -45,7 +45,7 @@ public class LibraryBuilder {
 		library = new Library(order, lock);
 		wq = new WorkQueue(nThreads);
 		doSearch = false;
-		doSave = false;
+		doSave = true;
 	}
 	
 	public LibraryBuilder (String inputpath, int nThreads, String order, String outputpath) {
@@ -86,17 +86,17 @@ public class LibraryBuilder {
 		} catch (InterruptedException e) {
 			System.out.println("interrupted");
 		}
-		wq = new WorkQueue(30);
-		parseLastfm();
-		this.wq.shutdown();
-		try {
-			this.wq.awaitTermination();
-		} catch (InterruptedException e) {
-			System.out.println("interrupted");
-		}
-//		if(doSave) {
-//			this.library.saveToFile(outputpath, order);
+//		wq = new WorkQueue(30);//TODO: uncomment later
+//		parseLastfm();
+//		this.wq.shutdown();
+//		try {
+//			this.wq.awaitTermination();
+//		} catch (InterruptedException e) {
+//			System.out.println("interrupted");
 //		}
+		if(doSave) {
+			this.library.saveToFile(outputpath, order);
+		}
 		if(doSearch) {
 			library.search(artistsToSearch, titlesToSearch, tagsToSearch, searchOutputpath);
 		}
