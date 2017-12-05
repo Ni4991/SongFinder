@@ -1,19 +1,25 @@
 package general;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Scanner;
 
+import concurrent.Fetcher;
 import concurrent.Lock;
 import concurrent.WorkQueue;
 import concurrent.Worker;
+import socket.HTTPFetcher;
 import songLibrary.Library;
 
 /**
@@ -80,14 +86,36 @@ public class LibraryBuilder {
 		} catch (InterruptedException e) {
 			System.out.println("interrupted");
 		}
-		if(doSave) {
-			this.library.saveToFile(outputpath, order);
+		wq = new WorkQueue(30);
+		parseLastfm();
+		this.wq.shutdown();
+		try {
+			this.wq.awaitTermination();
+		} catch (InterruptedException e) {
+			System.out.println("interrupted");
 		}
+//		if(doSave) {
+//			this.library.saveToFile(outputpath, order);
+//		}
 		if(doSearch) {
 			library.search(artistsToSearch, titlesToSearch, tagsToSearch, searchOutputpath);
 		}
 	}
-	
+	/**
+	 * 
+	 */
+	private void parseLastfm() {		
+		for(String artist : library.getCopyArtists()) {
+			try {
+				artist = URLEncoder.encode(artist, "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			this.wq.execute(new Fetcher(artist, library));
+		}
+	}
+
 	/**
 	 * a method to find file in sub directories.
 	 * @param dir
@@ -104,7 +132,7 @@ public class LibraryBuilder {
 				}
 				String fileName = files[i].getName();
 				if(fileName.toLowerCase().endsWith(".json")) {
-					wq.execute(new Worker(this.getLibrary(), files[i]));
+					wq.execute(new Worker(library, files[i]));
 				}	
 			}
 		}
