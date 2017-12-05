@@ -3,11 +3,6 @@ package servlets;
 import java.util.HashMap;
 import java.util.UUID;
 
-/**
- * will implement later.
- * @author nluo
- *
- */
 public class Data {
 
 	//maintain a map of name to UserInfo object
@@ -33,7 +28,7 @@ public class Data {
 			userInfo.put(name, new UserInfo(name));
 		}
 	}
- 
+
 	/*
 	 * For a given user, add a new todo.
 	 */
@@ -45,11 +40,6 @@ public class Data {
 		return true;
 	}
 	
-	public synchronized void clear(String name) {
-		if(userInfo.containsKey(name)) {
-			userInfo.get(name).clear();
-		}
-	}
 
 	/*
 	 * Returns a String containing an HTML representation of the
@@ -60,7 +50,7 @@ public class Data {
 		if(!userInfo.containsKey(name)) {
 			return null;
 		}		
-		return userInfo.get(name).historyToHtml();
+		return userInfo.get(name).listToHtml();
 	}
 
 

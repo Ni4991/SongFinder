@@ -34,32 +34,32 @@ public class SearchSongServer {
 		
 		Server server = new Server(8120);
         
-        	ServletContextHandler servhandler = new ServletContextHandler(ServletContextHandler.SESSIONS);        
-        	server.setHandler(servhandler);
+        ServletContextHandler servhandler = new ServletContextHandler(ServletContextHandler.SESSIONS);        
+        server.setHandler(servhandler);
  
-        	servhandler.addEventListener(new ServletContextListener() {
+        servhandler.addEventListener(new ServletContextListener() {
 
         	public void contextDestroyed(ServletContextEvent sce) {
 				// TODO Auto-generated method stub
 				
-		}
+			}
         		
-		public void contextInitialized(ServletContextEvent sce) {
-			LibraryBuilder lb = new LibraryBuilder();
-			lb.build();
-			Library library = lb.getLibrary();
-			sce.getServletContext().setAttribute(BaseServlet.LIBRARY, library);
-			sce.getServletContext().setAttribute(BaseServlet.DATA, new Data());
-		}
+			public void contextInitialized(ServletContextEvent sce) {
+				LibraryBuilder lb = new LibraryBuilder();
+				lb.build();
+				Library library = lb.getLibrary();
+				sce.getServletContext().setAttribute(BaseServlet.LIBRARY, library);
+				sce.getServletContext().setAttribute(BaseServlet.DATA, new Data());
+			}
         });
+        servhandler.addServlet(LoginServlet.class, "/login");
+        servhandler.addServlet(VerifyUserServlet.class, "/verifyuser"); 
         servhandler.addServlet(SearchServlet.class, "/search");
-        servhandler.addServlet(VerifyUserServlet.class, "/verifyuser");
-        servhandler.addServlet(TempDisplayServlet.class, "/display");
         servhandler.addServlet(SongsServlet.class, "/list");
+        servhandler.addServlet(LogoutServlet.class, "/logout");
 
         //set the list of handlers for the server
         server.setHandler(servhandler);
-        
         //start the server
         server.start();
         server.join();

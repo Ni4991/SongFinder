@@ -3,13 +3,9 @@ package servlets;
 import java.util.ArrayList;
 import java.util.UUID;
 
-/**
- * will implement later.
- * @author nluo
- *
- */
+
 public class UserInfo {
- 
+
 	private String name;
 	private ArrayList<String> searches;
 	
@@ -20,12 +16,8 @@ public class UserInfo {
 	}
 	
 	
-	public synchronized void addSearch(String search) {
-		this.searches.add(search);
-	}
-
-	public synchronized void clear() {
-		this.searches.clear();
+	public synchronized void addSearch(String item) {
+		this.searches.add(item);
 	}
 
 
@@ -33,17 +25,18 @@ public class UserInfo {
 		return name;
 	}
 	
-	public synchronized String historyToHtml() {
+	public synchronized String listToHtml() {
 		
 		StringBuilder builder = new StringBuilder();
 		builder.append("<table border=1 border-spacing=3px>");
-		builder.append("<tr><td colspan=2><b>" + name + "'s search history!</b></td></tr>");
+		builder.append("<tr><td colspan=2><b>" + name + "'s Search history</b></td></tr>");
 		int i = 0;
 		for(String search: searches) {
-			builder.append("<b><tr><td>" + search + i++ + "</td></tr></b>");
+			builder.append("<b><tr><td>" + search + "</td></tr></b>");
 		}
 		builder.append("</table>");
-		builder.append("<form action=\"list?clear=\" method=\"post\"><input type=\"submit\" value=\"Clear\"></form>");
 		return builder.toString();
 	}
+	
+	
 }
