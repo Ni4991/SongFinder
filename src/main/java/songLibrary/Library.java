@@ -310,6 +310,7 @@ public class Library {
 	 * @param si
 	 */
 	public void addForSearch(SongInfo si) {
+		lock.lockWrite();
 		byTrack_id.put(si.getTrack_id(), si);
 		if(byArtistForSearch.containsKey(si.getArtist())) {
 			byArtistForSearch.get(si.getArtist()).add(si);
@@ -337,6 +338,7 @@ public class Library {
 				byTagForSearch.put(tag, value);
 			}
 		}
+		lock.unlockWrite();
 	}
 
 	/**
@@ -482,9 +484,11 @@ public class Library {
 	}
 	
 	public HashSet<String> getCopyArtists() {
+		lock.lockRead();
 		for(String artist : byArtist.keySet()) {
 			copyArtists.add(artist);
 		}
+		lock.unlockRead();
 		return copyArtists;
 	}
 	
@@ -576,10 +580,11 @@ public class Library {
 				}
 				output.write(sb.toString());
 			}
-			lock.unlockRead();
+			
 		}catch(IOException e) {
 			System.out.print(e.getMessage());	
 		}
+		lock.unlockRead();
 		return true;
 	}
 }
