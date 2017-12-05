@@ -20,12 +20,13 @@ public class HTTPFetcher {
 				OutputStream out = sock.getOutputStream(); //get the output stream from socket
 				InputStream instream = sock.getInputStream(); //get the input stream from socket
 				//wrap the input stream to make it easier to read from
-				BufferedReader reader = new BufferedReader(new InputStreamReader(instream))
+				BufferedReader reader = new BufferedReader(new InputStreamReader(instream, "UTF-8"))
 		) { 
 
 			//send request
 			String request = getRequest(host, path);
 			out.write(request.getBytes());
+			
 			out.flush();
 
 			//receive response
