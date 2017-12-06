@@ -52,6 +52,8 @@ public class SearchSongServer {
 				sce.getServletContext().setAttribute(BaseServlet.DATA, new Data());
 			}
         });
+        
+//        servhandler.addServlet(FbLoginServlet.class, "/fb");
         servhandler.addServlet(LoginServlet.class, "/login");
         servhandler.addServlet(VerifyUserServlet.class, "/verifyuser"); 
         servhandler.addServlet(SearchServlet.class, "/search");

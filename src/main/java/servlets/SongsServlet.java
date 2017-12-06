@@ -32,18 +32,83 @@ public class SongsServlet extends BaseServlet{
 		String viewtype = request.getParameter("viewtype");
 		String pageSize = request.getParameter("pageSize");
 		String showHistory = request.getParameter("history");
+		String pri = request.getParameter("private");
+		String clearHis = request.getParameter("clear");
+		String home = request.getParameter("home");
+		String popular = request.getParameter("popular");
+		
+		
 		
 		Library library = (Library) getServletContext().getAttribute(LIBRARY);
 				
 		HttpSession session = request.getSession();
 		String name = (String) session.getAttribute(NAME);
 		
+		
+		
+		if(home != null && home.equals("yes")) {
+			if(name != null) {
+				response.sendRedirect(response.encodeRedirectURL("/search?name=" + name));
+			}else {
+				response.sendRedirect(response.encodeRedirectURL("/search"));
+			}
+		}
+		
 		PrintWriter out = prepareResponse(response);
 	
+		if(clearHis != null && clearHis.equals("yes")) {
+			out.println(data.clear(name));
+		}
+		out.println("<style>\r\n" + 
+				"#table1\r\n" + 
+				"{\r\n" + 
+				"	font-family:\"Trebuchet MS\", Arial, Helvetica, sans-serif;\r\n" + 
+				"	width:100%;\r\n" + 
+				"	border-collapse:collapse;\r\n" + 
+				"}\r\n" + 
+				"#table1 td, #table1 th \r\n" + 
+				"{\r\n" + 
+				"	font-size:1em;\r\n" + 
+				"	border:1px solid #98bf21;\r\n" + 
+				"	padding:3px 7px 2px 7px;\r\n" + 
+				"}\r\n" + 
+				"#table1 th \r\n" + 
+				"{\r\n" + 
+				"	font-size:1.1em;\r\n" + 
+				"	text-align:left;\r\n" + 
+				"	padding-top:5px;\r\n" + 
+				"	padding-bottom:4px;\r\n" + 
+				"	background-color:#A7C942;\r\n" + 
+				"	color:#ffffff;\r\n" + 
+				"}\r\n" + 
+				"#table1 tr.alt td \r\n" + 
+				"{\r\n" + 
+				"	color:#000000;\r\n" + 
+				"	background-color:#EAF2D3;\r\n" + 
+				"}"+
+				"ul.a {list-style-type:circle;}" +
+				"body,td,th{font-family:Georgia, serif;}" +
+				"h1\r\n" + 
+				"{\r\n" + 
+				"	background-color:#6495ed;\r\n" + 
+				"}\r\n" + 
+				"p\r\n" + 
+				"{\r\n" + 
+				"	background-color:#e0ffff;\r\n" + 
+				"}\r\n" + 
+				"div\r\n" + 
+				"{\r\n" + 
+				"	background-color:#b0c4de;\r\n" + 
+				"}\r\n" + 
+				"</style>");
 		
 		out.println("<h1>Hello, " + name + "!</h1>");
 		out.println("<p>You've got a song finder in me! Search for an artist, title or tag and "
 				+ "I will give you similar songs.</p><hr/>");
+		
+		if(popular != null && popular.equals("yes")) {
+			out.println(data.getPopSearch());
+		}
 		
 		out.println("<form action=\"list\" method=\"post\">");
 		out.println("<label>Search type: </label>" 
@@ -52,18 +117,30 @@ public class SongsServlet extends BaseServlet{
 				+ "<option value=\"Song Title\">Song Title</option>" 
 				+ "<option value=\"Tag\">Tag</option>" 
 				+ "</select>");
-		out.println("partial/caseignore search: <input type=\"text\" name=\"partial\"/>");
+		out.println("search: <input type=\"text\" name=\"partial\" placeholder=\"partial/caseignore..\"/>");
+		//you'll see a private search checkbox only if you are logged in
+		if(name != null) {
+			out.println("<input type=\"checkbox\" name=\"private\" value=\"private\" /> private search<br/>");
+		}
+		out.println(" Display<input type=\"text\" name=\"pageSize\" placeholder=\"default:display all\"/>results per page.");
 		out.println("<input type=\"submit\" value=\"Search\"/>");
 		out.println("</form>");
 		
 		if(showHistory != null && showHistory.equals("yes")) {
-			out.println(data.listToHtml(name));
+			out.println(data.hisToHtml(name));
+			out.println("<form action=\"list\" method=\"post\">");
+			out.println("<input type=\"hidden\" name = \"clear\" value=\"yes\"/>");
+			out.println("<input type=\"submit\" value=\"Clear history\"/>");
+			out.println("</form>");
 		}
+		
 		out.println("<center>");
 	
 		if(partial != null) {
 			if(name != null) {
-				data.add(name, partial);
+				if(pri == null) {
+					data.add(name, partial);
+				}
 			}
 			out.println(library.searchToHtml(type2, partial));
 		}
@@ -77,13 +154,19 @@ public class SongsServlet extends BaseServlet{
 		}
 		out.println("<br/>");
 		out.println("</center>");
+		
+		out.println("<form action=\"list\" method=\"post\">");
+		out.println("<input type=\"hidden\" name = \"home\" value=\"yes\"/>");
+		out.println("<input type=\"submit\" value=\"Go to search main page\"/>");
+		out.println("</form>");
+		
 		out.println("<form action=\"logout\" method=\"post\">");
 		out.println("<input type=\"submit\" value=\"Logout\"/>");
 		out.println("</form>");
 		
 		out.println(footer());
 		//reference: http://blog.csdn.net/koself/article/details/8534119
-		if(pageSize != null) {
+		if(pageSize != null && pageSize.trim().length() > 0) {
 			out.println("<script>\r\n" + 
 					"     var theTable = document.getElementById(\"table2\");\r\n" + 
 					"     var totalPage = document.getElementById(\"spanTotalPage\");\r\n" + 

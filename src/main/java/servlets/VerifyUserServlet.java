@@ -26,11 +26,12 @@ public class VerifyUserServlet extends BaseServlet {
 	{
 		String name = request.getParameter(NAME);
 		String pass = request.getParameter("password");
+		String keep = request.getParameter("keep");
 		
-		
+		//no username info in session
 		if(name == null || name.trim().equals("")) {
-			response.sendRedirect(response.encodeRedirectURL("/login?" + STATUS + "=" + ERROR));
-			return;
+			//maybe username info in cookies
+			response.sendRedirect(response.encodeRedirectURL("/search"));
 		}
 		
 		HttpSession session = request.getSession();
@@ -46,8 +47,19 @@ public class VerifyUserServlet extends BaseServlet {
 							
 		//redirect to search
 		if(pass.equals("123")) {
+			if(keep != null) {
+				Cookie username = new Cookie("username", name);
+				Cookie password = new Cookie("password", pass); 
+				
+				username.setMaxAge(2 * 7 * 24 * 3600);//2 weeks
+				password.setMaxAge(2 * 7 * 24 * 3600);
+				
+				response.addCookie(username);
+				response.addCookie(password);
+			}
 			response.sendRedirect(response.encodeRedirectURL("/search?name=" + name));
-		}else {
+		}
+		else {
 			PrintWriter out = prepareResponse(response);
 			out.println(header("Login fail"));	
 			out.println("<h1>Wrong password, " + name + "!</h1>");
