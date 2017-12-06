@@ -294,13 +294,6 @@ public class Library {
 	}
 	
 	/**
-	 * convert search result to html representation.
-	 * @param type
-	 * @param query
-	 * @return
-	 */
-	
-	/**
 	 * search method.
 	 * @param artistsToSearch
 	 * @param titlesToSearch
