@@ -386,7 +386,7 @@ public class Library {
 	 * @return
 	 * @throws JSONException
 	 */
-	public JSONArray searchByArtist(ArrayList<String> artistsToSearch) throws JSONException {
+	private JSONArray searchByArtist(ArrayList<String> artistsToSearch) throws JSONException {
 		JSONArray array2 = new JSONArray();
 		for(String artist : artistsToSearch) {
 			JSONObject obj1 = new JSONObject();
@@ -439,7 +439,7 @@ public class Library {
 	 * @return
 	 * @throws JSONException
 	 */
-	public JSONArray searchByTag(ArrayList<String> tagsToSearch) throws JSONException {
+	private JSONArray searchByTag(ArrayList<String> tagsToSearch) throws JSONException {
 		JSONArray array2 = new JSONArray();
 		for(String tag : tagsToSearch) {
 			JSONObject obj1 = new JSONObject();
@@ -469,7 +469,7 @@ public class Library {
 	 * @return
 	 * @throws JSONException
 	 */
-	public JSONArray searchByTitle(ArrayList<String> titlesToSearch) throws JSONException {
+	private JSONArray searchByTitle(ArrayList<String> titlesToSearch) throws JSONException {
 		JSONArray array2 = new JSONArray();
 		for(String title : titlesToSearch) {
 			JSONObject obj1 = new JSONObject();
