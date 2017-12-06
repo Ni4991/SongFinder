@@ -69,11 +69,9 @@ public class Library {
 		artistsByAlpha = new TreeSet<ArtistInfo>(new CompareByAlpha());
 		copyArtists = new HashSet<String>();
 	}
-	//TODO:lock all methods.
-	
 	
 	public String searchToHtml(String type, String partial) {
-		lock.lockWrite();
+		lock.lockRead();
 		TreeSet<SongInfo> similarSongs = null;
 		HashSet<String> containsQ = null;
 		if(type.equals("Artist")) {
@@ -146,7 +144,7 @@ public class Library {
 			similarSongs = new TreeSet<SongInfo>(new CompareByTrack_id());
 			containsQ = new HashSet<String>();
 			for(String tg : byTag.keySet()) {
-				if(tg.contains(partial.toUpperCase())) {
+				if(tg.toLowerCase().contains(partial.toLowerCase())) {
 					containsQ.add(tg);
 				}
 			}
@@ -175,8 +173,11 @@ public class Library {
 			}
 		}
 		StringBuilder builder = new StringBuilder();
-		builder.append("<table id = \"table1\" border=1 border-spacing=3px>");
-		builder.append("<thead><tr><th>Artist</th><th>Song Title</th></tr></thead><tbody id = \"table2\">");
+		builder.append("<table id = \"table1\" align=\"center\" border=1 border-spacing=3px>");
+		builder.append("<thead><tr><th>Artist</th><th>Song title</th></tr></thead><tbody id = \"table2\">");
+		int i = 0;
+		String s1 = "<tr>";
+		String s2 = "<tr class=\"alt\">";
 		for(SongInfo si : similarSongs) {
 			SongInfo song = new SongInfo(si.getArtist(), si.getTitle(), null, si.getTrack_id(), null);
 			ArrayList<String> newSimilars = new ArrayList<String>();
@@ -185,19 +186,36 @@ public class Library {
 			}
 			ArrayList<String> titlesToSearch = new ArrayList<String>();
 			titlesToSearch.add(song.getTitle());
-			builder.append("<tr><td>" + song.getArtist() + "</td>"
+			String img = "";
+			for(ArtistInfo ainfo : artistsByAlpha) {
+				if(ainfo.getName().equals(song.getArtist())) {
+					img = ainfo.getImage();
+					break;
+				}
+			} 
+			if(i % 2 == 0) {
+				builder.append(s1);
+			}
+			else if((i % 2 != 0)) {
+				builder.append(s2);
+			}
+			builder.append("<td>" + song.getArtist() + "</td>"
 					+ "<td><details>\r\n" + 
 					"    <summary>"+ song.getTitle() +"</summary>\r\n" + 
 					"        <p>details: </p>\r\n" + 
 					"        <ul>\r\n" + 
+					"			 <li><img src=" + img + "alt=\"img\" />" +
 					"            <li>artist name: " + song.getArtist() + "</li>\r\n" + 
 					"            <li>title: "+ song.getTitle() + "</li>\r\n" + 
 					"            <li>similar songs: " + newSimilars + "</li>\r\n" + 
 					"        </ul>\r\n" + 
 					"    </details> " + "</td></tr>");
+			i++;
 		}
-		builder.append("</table>");
-		lock.unlockWrite();
+		builder.append("</tbody></table>");
+		builder.append("<span id=\"spanPre\">Previous</span> <span id=\"spanNext\"> Next</span> "
+				+ " Page <span id=\"spanPageNum\"></span> of <span id=\"spanTotalPage\"></span> Pages");
+		lock.unlockRead();
 		return builder.toString();
 	}
 	
@@ -206,9 +224,18 @@ public class Library {
 		StringBuilder builder = new StringBuilder();
 		builder.append("<table id = \"table1\" align=\"center\" border=1 border-spacing=3px>");
 		builder.append("<thead><tr><th>Artist</th><th>Play count</th></tr></thead><tbody id = \"table2\">");
+		int i = 0;
+		String s1 = "<tr>";
+		String s2 = "<tr class=\"alt\">";
+		if(i % 2 == 0) {
+			builder.append(s1);
+		}
+		else if((i % 2 != 0)) {
+			builder.append(s2);
+		}
 		for(ArtistInfo ainfo : artistsByAlpha) {
 			ArtistInfo ai = new ArtistInfo(ainfo.getName(), ainfo.getBio(), ainfo.getImage(), ainfo.getListeners(), ainfo.getPlaycount());
-			builder.append("<tr><td><details>\r\n" + 
+			builder.append("<td><details>\r\n" + 
 					"    <summary>"+ ai.getName() +"</summary>\r\n" + 
 					"        <p>details: </p>\r\n" + 
 					"        <ul>\r\n" + 
@@ -220,8 +247,9 @@ public class Library {
 					"        </ul>\r\n" + 
 					"    </details> " + "</td><td>" + ai.getPlaycount() + "</td>"
 					+ "</tr>");
+			i++;
 		}
-		builder.append("</table>");
+		builder.append("</tbody></table>");
 		builder.append("<span id=\"spanPre\">Previous</span> <span id=\"spanNext\"> Next</span> "
 				+ " Page <span id=\"spanPageNum\"></span> of <span id=\"spanTotalPage\"></span> Pages");
 		lock.unlockRead();
@@ -233,9 +261,18 @@ public class Library {
 		StringBuilder builder = new StringBuilder();
 		builder.append("<table id = \"table1\" align=\"center\" border=1 border-spacing=3px>");
 		builder.append("<thead><tr><th>Play count</th><th>Artist</th></tr></thead><tbody id = \"table2\">");
+		int i = 0;
+		String s1 = "<tr>";
+		String s2 = "<tr class=\"alt\">";
+		if(i % 2 == 0) {
+			builder.append(s1);
+		}
+		else if((i % 2 != 0)) {
+			builder.append(s2);
+		}
 		for(ArtistInfo ainfo : artistsByPCount) {
 			ArtistInfo ai = new ArtistInfo(ainfo.getName(), ainfo.getBio(), ainfo.getImage(), ainfo.getListeners(), ainfo.getPlaycount());
-			builder.append("<tr><td>" + ai.getPlaycount() + "</td>"
+			builder.append("<td>" + ai.getPlaycount() + "</td>"
 					+ "<td><details>\r\n" + 
 					"    <summary>"+ ai.getName() +"</summary>\r\n" + 
 					"        <p>details: </p>\r\n" + 
@@ -247,7 +284,9 @@ public class Library {
 					"            <li>bio: " + ai.getBio() + "</li>\r\n" + 
 					"        </ul>\r\n" + 
 					"    </details> " + "</td></tr>");
+			i++;
 		}
+		builder.append("</tbody></table>");
 		builder.append("<span id=\"spanPre\">Previous</span> <span id=\"spanNext\"> Next</span> "
 				+ " Page <span id=\"spanPageNum\"></span> of <span id=\"spanTotalPage\"></span> Pages");
 		lock.unlockRead();
