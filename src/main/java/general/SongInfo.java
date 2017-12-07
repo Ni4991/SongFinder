@@ -10,7 +10,7 @@ import java.util.TreeSet;
  *
  */
 public class SongInfo {
-	private String artist, title, track_id;
+	private String artist, title, track_id, image;
 	private HashSet<String> tags;
 	private ArrayList<String> similars;
 	
@@ -20,6 +20,10 @@ public class SongInfo {
 		this.tags = tags;
 		this.track_id = track_id;
 		this.similars = similars;
+	}
+	
+	public void addImage(String img) {
+		this.image = img;
 	}
 	
 	/**
