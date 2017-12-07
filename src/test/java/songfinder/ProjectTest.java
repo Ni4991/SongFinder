@@ -16,8 +16,6 @@ import org.junit.Test;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import general.Driver;
-
 /**
  * Original author sjengle, modified by srollins.
  *
