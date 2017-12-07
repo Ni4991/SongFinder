@@ -36,38 +36,41 @@ public class SearchMethods {
 	 * @throws JSONException
 	 */
 	public JSONObject search(ArrayList<String> artistsToSearch, ArrayList<String> titlesToSearch, ArrayList<String> tagsToSearch, String searchOutputpath) throws JSONException {
-		lock.lockRead();
-		JSONObject searchOutput = new JSONObject();
-		if(!artistsToSearch.isEmpty()) {
-			ArrayList<String> aToSearch = new ArrayList<String>();
-			for(String artist : artistsToSearch) {
-				aToSearch.add(artist);
+		try{
+			lock.lockRead();
+			JSONObject searchOutput = new JSONObject();
+			if(!artistsToSearch.isEmpty()) {
+				ArrayList<String> aToSearch = new ArrayList<String>();
+				for(String artist : artistsToSearch) {
+					aToSearch.add(artist);
+				}
+				searchOutput.put("searchByArtist", searchByArtist(aToSearch));
 			}
-			searchOutput.put("searchByArtist", searchByArtist(aToSearch));
-		}
-		if(!tagsToSearch.isEmpty()) {
-			ArrayList<String> tgToSearch = new ArrayList<String>();
-			for(String tag : tagsToSearch) {
-				tgToSearch.add(tag);
+			if(!tagsToSearch.isEmpty()) {
+				ArrayList<String> tgToSearch = new ArrayList<String>();
+				for(String tag : tagsToSearch) {
+					tgToSearch.add(tag);
+				}
+				searchOutput.put("searchByTag", searchByTag(tgToSearch));
 			}
-			searchOutput.put("searchByTag", searchByTag(tgToSearch));
-		}
-		if(!titlesToSearch.isEmpty()) {
-			ArrayList<String> tToSearch = new ArrayList<String>();
-			for(String t : titlesToSearch) {
-				tToSearch.add(t);
+			if(!titlesToSearch.isEmpty()) {
+				ArrayList<String> tToSearch = new ArrayList<String>();
+				for(String t : titlesToSearch) {
+					tToSearch.add(t);
+				}
+				searchOutput.put( "searchByTitle", searchByTitle(tToSearch));
 			}
-			searchOutput.put( "searchByTitle", searchByTitle(tToSearch));
+			Path outPath = Paths.get(searchOutputpath);
+			outPath.getParent().toFile().mkdirs();
+			try(BufferedWriter output = Files.newBufferedWriter(outPath)){
+				output.write(searchOutput.toString());
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}     
+			return searchOutput;
+		}finally {
+			lock.unlockRead();
 		}
-		Path outPath = Paths.get(searchOutputpath);
-		outPath.getParent().toFile().mkdirs();
-		try(BufferedWriter output = Files.newBufferedWriter(outPath)){
-			output.write(searchOutput.toString());
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}     
-		lock.unlockRead();
-		return searchOutput;
 	}
 	
 	
