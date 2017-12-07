@@ -11,7 +11,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import general.Driver;
+import songfinder.Driver;
 
 /**
  * Adapted from sjengle.
