@@ -21,6 +21,7 @@ import concurrent.WorkQueue;
 import concurrent.Worker;
 import socket.HTTPFetcher;
 import songLibrary.Library;
+import songLibrary.SearchMethods;
 
 /**
  * a class to add .json files to the song library.
@@ -32,6 +33,7 @@ public class LibraryBuilder {
 	private int nThreads;
 	private ArrayList<String> artistsToSearch, titlesToSearch, tagsToSearch;
 	private Library library;
+	private SearchMethods sm;
 	private WorkQueue wq;
 	private Lock lock;
 	private boolean doSearch, doSave;
@@ -45,7 +47,7 @@ public class LibraryBuilder {
 		library = new Library(order, lock);
 		wq = new WorkQueue(nThreads);
 		doSearch = false;
-		doSave = true;
+		doSave = false;
 	}
 	
 	public LibraryBuilder (String inputpath, int nThreads, String order, String outputpath) {
@@ -86,6 +88,7 @@ public class LibraryBuilder {
 		} catch (InterruptedException e) {
 			System.out.println("interrupted");
 		}
+		sm = new SearchMethods(library, lock);
 //		wq = new WorkQueue(30);//TODO: uncomment later
 //		parseLastfm();
 //		this.wq.shutdown();
@@ -98,7 +101,7 @@ public class LibraryBuilder {
 			this.library.saveToFile(outputpath, order);
 		}
 		if(doSearch) {
-			library.search(artistsToSearch, titlesToSearch, tagsToSearch, searchOutputpath);
+			this.sm.search(artistsToSearch, titlesToSearch, tagsToSearch, searchOutputpath);
 		}
 	}
 	/**
