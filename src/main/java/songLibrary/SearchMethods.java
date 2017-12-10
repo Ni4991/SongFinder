@@ -94,22 +94,11 @@ public class SearchMethods {
 				//library.getByAForSearch() and library.getByT_id() are deep copied down to songinfo.
 				if(library.getByAForSearch().containsKey(artist)) {
 					for(SongInfo song : library.getByAForSearch().get(artist)) {
-						for(String track_id : song.getSimilars()) {
-							if(library.getByT_id().containsKey(track_id)) {
-								similarSongs.add(library.getByT_id().get(track_id));
-							}
-						}
+						putTrack_id(similarSongs, song.getSimilars());
 					}
 				}
 				for(SongInfo si : similarSongs) {
-					if(si != null) {
-						JSONObject obj2 = new JSONObject();
-						obj2.put("artist", si.getArtist());
-						obj2.put("trackId", si.getTrack_id());
-						obj2.put("title", si.getTitle());
-						array3.put(obj2);
-
-					}
+					putSimilar(si, array3);
 				}
 				obj1.put("similars", array3);
 				array2.put(obj1);
@@ -135,13 +124,7 @@ public class SearchMethods {
 				JSONArray array3 = new JSONArray();
 				if(library.getByTaForSearch().containsKey(tag)) {
 					for(SongInfo song : library.getByTaForSearch().get(tag)) {
-						if(song != null) {
-							JSONObject obj2 = new JSONObject();
-							obj2.put("artist", song.getArtist());
-							obj2.put("trackId", song.getTrack_id());
-							obj2.put("title", song.getTitle());
-							array3.put(obj2);
-						}
+						putSimilar(song, array3);
 					}	
 				}
 				obj1.put("similars", array3);
@@ -178,13 +161,7 @@ public class SearchMethods {
 						}
 					}
 					for(SongInfo si : similarSongs) {
-						if(si != null) {
-							JSONObject obj2 = new JSONObject();
-							obj2.put("artist", si.getArtist());
-							obj2.put("trackId", si.getTrack_id());
-							obj2.put("title", si.getTitle());
-							array3.put(obj2);
-						}
+						putSimilar(si, array3);
 					}	
 				}
 				obj1.put("similars", array3);
@@ -194,6 +171,48 @@ public class SearchMethods {
 			return array2;
 		}
 		finally {
+			lock.unlockRead();
+		}
+	}
+
+	/**
+	 * helper.
+	 * @param similarSongs
+	 * @param similars
+	 * @return
+	 */
+	private TreeSet<SongInfo> putTrack_id(TreeSet<SongInfo> similarSongs, ArrayList<String> similars) {
+		try{
+			lock.lockRead();
+			for(String track_id : similars) {
+				if(library.getByT_id().containsKey(track_id)) {
+					similarSongs.add(library.getByT_id().get(track_id));
+				}
+			}
+			return similarSongs;
+		}finally {
+			lock.unlockRead();
+		}
+	}
+	
+	/**
+	 * helper.
+	 * @param si
+	 * @param array3
+	 * @return
+	 */
+	private JSONArray putSimilar(SongInfo si, JSONArray array3) {
+		try {
+			lock.lockRead();
+				if(si != null) {
+				JSONObject obj2 = new JSONObject();
+				obj2.put("artist", si.getArtist());
+				obj2.put("trackId", si.getTrack_id());
+				obj2.put("title", si.getTitle());
+				array3.put(obj2);
+			}
+			return array3;
+		}finally {
 			lock.unlockRead();
 		}
 	}
