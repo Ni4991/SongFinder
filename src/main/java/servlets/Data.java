@@ -84,7 +84,7 @@ public class Data {
 	public void addUser(String name) {
 		lock.lockWrite();
 		if(!userInfo.containsKey(name)) {
-			userInfo.put(name, new UserInfo(name));
+			userInfo.put(name, new UserInfo(name, lock));
 		}
 		lock.unlockWrite();
 	}
