@@ -20,91 +20,118 @@ public class Data {
 	//maintain a map of name to UserInfo object
 	protected HashMap<String, UserInfo> userInfo;
 	private TreeMap<String, Integer> popularSearch;
+	private Lock lock;
 
 	public Data() {
 		userInfo = new HashMap<String, UserInfo>();
-		popularSearch = new TreeMap<String, Integer>();  
+		popularSearch = new TreeMap<String, Integer>(); 
+		lock = new Lock();
 	}
 	
 	public String getPopSearch() {
-		for(String user : userInfo.keySet()) {
-			for(String search : userInfo.get(user).getSearches()) {
-				if (popularSearch.containsKey(search)) {
-					popularSearch.put(search, popularSearch.get(search) + 1);
-				} else {
-					popularSearch.put(search, 1);
+		try {
+			lock.lockRead();
+			for(String user : userInfo.keySet()) {
+				for(String search : userInfo.get(user).getSearches()) {
+					if (popularSearch.containsKey(search)) {
+						popularSearch.put(search, popularSearch.get(search) + 1);
+					} else {
+						popularSearch.put(search, 1);
+					}
 				}
 			}
-		}
-		// ref: http://blog.csdn.net/xiaokui_wingfly/article/details/42964695
-		List<Entry<String, Integer>> list = new ArrayList<Map.Entry<String, Integer>>(popularSearch.entrySet());  
-
-		Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {  
-		   
-			@Override
-			public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
-				// TODO Auto-generated method stub
-				 return o2.getValue() - (o1.getValue()); // 降序  
+			// ref: http://blog.csdn.net/xiaokui_wingfly/article/details/42964695
+			List<Entry<String, Integer>> list = new ArrayList<Map.Entry<String, Integer>>(popularSearch.entrySet());  
+	
+			Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {  
+			   
+				@Override
+				public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
+					// TODO Auto-generated method stub
+					 return o2.getValue() - (o1.getValue()); // 降序  
+				}  
+			});  
+			StringBuilder builder = new StringBuilder();
+			builder.append("<table align=\"center\" border=1 border-spacing=3px>");
+			builder.append("<thead><tr><th>Search item</th><th>Times searched</th></tr></thead><tbody>");
+			for (Entry<String, Integer> mapping : list) {   
+				builder.append("<tr><td>" + mapping.getKey() + "</td>"
+						+ "<td>" + mapping.getValue()+ "</td></tr>");
 			}  
-		});  
-		StringBuilder builder = new StringBuilder();
-		builder.append("<table align=\"center\" border=1 border-spacing=3px>");
-		builder.append("<thead><tr><th>Search item</th><th>Times searched</th></tr></thead><tbody>");
-		for (Entry<String, Integer> mapping : list) {   
-			builder.append("<tr><td>" + mapping.getKey() + "</td>"
-					+ "<td>" + mapping.getValue()+ "</td></tr>");
-		}  
-		builder.append("</tbody></table>");
-		return builder.toString();
+			builder.append("</tbody></table>");
+			return builder.toString();
+		}finally {
+			lock.unlockRead();
+		}
 	}
 		
 	/*
 	 * Returns true if the user exists in the data store.
 	 */
 	public boolean userExists(String name) {
-		return userInfo.containsKey(name);
+		try {
+			lock.lockRead();
+			return userInfo.containsKey(name);
+		}finally {
+			lock.unlockRead();
+		}
+		
 	}
 	
 	/*
 	 * Add a new UserInfo object for a particular user.
 	 */
 	public void addUser(String name) {
+		lock.lockWrite();
 		if(!userInfo.containsKey(name)) {
 			userInfo.put(name, new UserInfo(name));
 		}
+		lock.unlockWrite();
 	}
 
 	/*
 	 * For a given user, add a new todo.
 	 */
-	public boolean add(String name, String item) {
+	public void add(String name, String item) {
+		lock.lockWrite();
 		if(!userInfo.containsKey(name)) {
-			return false;
+			return;
 		}
 		userInfo.get(name).addSearch(item);
-		return true;
+		lock.unlockWrite();
 	}
 	
-	public boolean addLoginTime(String name, String loginTime) {
+	public void addLoginTime(String name, String loginTime) {
+		lock.lockWrite();
 		if(!userInfo.containsKey(name)) {
-			return false;
+			return;
 		}
 		userInfo.get(name).setLoginTime(loginTime);
-		return true;
+		lock.unlockWrite();
 	}
 	
 	public String clear(String name) {
-		if(userInfo.containsKey(name)) {
-			userInfo.get(name).clear();
+		try {
+			lock.lockWrite();
+			if(userInfo.containsKey(name)) {
+				userInfo.get(name).clear();
+			}
+			return "<p>You have cleared your search history.</p>";
+		}finally {
+			lock.unlockWrite();
 		}
-		return "<p>You have cleared your search history.</p>";
 	}
 	
 	public String getLoginTime(String name) {
-		if(!userInfo.containsKey(name)) {
-			return null;
-		}	
-		return userInfo.get(name).getLoginTime();
+		try {
+			lock.lockRead();
+			if(!userInfo.containsKey(name)) {
+				return null;
+			}	
+			return userInfo.get(name).getLoginTime();
+		}finally {
+			lock.unlockRead();
+		}
 	}
 	
 
@@ -113,10 +140,16 @@ public class Data {
 	 * list associated with the session identified by id.
 	 */
 	public String hisToHtml(String name) {
-		if(!userInfo.containsKey(name)) {
-			return null;
-		}	
-		return userInfo.get(name).historyToHtml();
+		try {
+			lock.lockRead();
+			if(!userInfo.containsKey(name)) {
+				return null;
+			}	
+			return userInfo.get(name).historyToHtml();
+		}finally {
+			lock.unlockRead();
+		}
+		
 	}
 
 
