@@ -28,6 +28,37 @@ public class Data {
 		lock = new Lock();
 	}
 	
+	public String usersListToHtml() {
+		try {
+			lock.lockRead();
+			StringBuilder builder = new StringBuilder();
+			builder.append("<table border=1 border-spacing=3px>");
+			builder.append("<tr><td colspan=2><b>List of all users</b></td></tr>");
+			for(String user: userInfo.keySet()) {
+				builder.append("<b><tr><td>" + "<details><summary>"+ user + "</summary>" + "<p>search history: </p><ul>");
+				for(String search : userInfo.get(user).getSearches()) {
+					builder.append("<li>" + search + "</li>");
+				}
+				builder.append("</ul></details></td><td><form action=\"admin?delete=" + user + "\" method=\"post\"><input type=\"submit\" value=\"delete\"></form></td></tr></b>");
+			}
+			builder.append("</table>");
+			return builder.toString();
+		}finally {
+			lock.unlockRead();
+		}
+	}
+	
+	public void deleteUser(String name) {
+		try {
+			lock.lockWrite();
+			if(userInfo.containsKey(name)) {
+				userInfo.remove(name);
+			}
+		}finally {
+			lock.unlockWrite();
+		}
+	}
+	
 	public String getPopSearch() {
 		try {
 			lock.lockRead();

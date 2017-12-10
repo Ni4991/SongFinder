@@ -31,7 +31,6 @@ public class UserInfo {
 		}finally {
 			lock.unlockRead();
 		}
-		
 	}
 	
 	public void clear() {

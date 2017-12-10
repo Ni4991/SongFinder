@@ -37,8 +37,6 @@ public class SongsServlet extends BaseServlet{
 		String home = request.getParameter("home");
 		String popular = request.getParameter("popular");
 		
-		
-		
 		Library library = (Library) getServletContext().getAttribute(LIBRARY);
 				
 		HttpSession session = request.getSession();

@@ -31,30 +31,28 @@ public class VerifyUserServlet extends BaseServlet {
 		String pass = request.getParameter("password");
 		String keep = request.getParameter("keep");
 		
-		//no username info in session
+		if(name.equals("admin") && pass.equals("admin")) {
+			response.sendRedirect(response.encodeRedirectURL("/admin"));
+		}
+		
 		if(name == null || name.trim().equals("")) {
-			//maybe username info in cookies
 			response.sendRedirect(response.encodeRedirectURL("/search?name="));
 		}
 		
 		HttpSession session = request.getSession();
 		session.setAttribute(NAME, name);
 		
-		//OPTION 2: Store volatile data in a single, shared object that is stored in the servlet context and
-		//can therefore be accessed by all users/sessions/servlets.
-		
-		//map id to name and userinfo
 		Data data = (Data)getServletContext().getAttribute(DATA);
-		//we assume no username conflicts and provide no ability to register for our service!
-		data.addUser(name);  
-							
+		if((name != null || !name.trim().equals(""))){
+			data.addUser(name);  
+		}
+					
 		//redirect to search
 		if(pass.equals("123")) {
 				DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  
 				String dateTime = dateFormat.format(new Date());  
 				data.addLoginTime(name, dateTime);
 			if(keep != null) {
-				
 				
 				Cookie username = new Cookie("username", name);
 				Cookie password = new Cookie("password", pass); 

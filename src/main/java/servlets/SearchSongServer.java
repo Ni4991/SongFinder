@@ -53,11 +53,11 @@ public class SearchSongServer {
 			}
         });
         
-//        servhandler.addServlet(FbLoginServlet.class, "/fb");
         servhandler.addServlet(LoginServlet.class, "/login");
         servhandler.addServlet(VerifyUserServlet.class, "/verifyuser"); 
         servhandler.addServlet(SearchServlet.class, "/search");
         servhandler.addServlet(SongsServlet.class, "/list");
+        servhandler.addServlet(AdminServlet.class, "/admin");
         servhandler.addServlet(LogoutServlet.class, "/logout");
 
         //set the list of handlers for the server

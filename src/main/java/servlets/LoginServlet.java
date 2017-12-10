@@ -35,6 +35,7 @@ public class LoginServlet extends BaseServlet {
 		out.println(header("Login Page"));	
 		
 		out.println("<style>\r\n" + 
+				"body {TEXT-ALIGN: center;}" +
 				"body,td,th{font-family:Georgia, serif;}" +
 				"h1\r\n" + 
 				"{\r\n" + 
@@ -81,7 +82,7 @@ public class LoginServlet extends BaseServlet {
 		out.println("<input type=\"submit\" value=\"Login\"/>");
 		out.println("</form>");
 		
-		out.println("<p>password is 123. username can be anything.</p>");
+		out.println("<p>password is 123. username can be anything.<br>to log in to admin's interface, enter admin as both username and password.</p>");
 		
 		out.println(footer());
 		
