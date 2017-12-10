@@ -248,8 +248,6 @@ public class Library {
 				i++;
 			}
 			builder.append("</tbody></table>");
-			builder.append("<span id=\"spanPre\">Previous</span> <span id=\"spanNext\"> Next</span> "
-					+ " Page <span id=\"spanPageNum\"></span> of <span id=\"spanTotalPage\"></span> Pages");
 			return builder.toString();
 		}finally {
 			lock.unlockRead();
@@ -427,8 +425,6 @@ public class Library {
 				i++;
 			}
 			builder.append("</tbody></table>");
-			builder.append("<span id=\"spanPre\">Previous</span> <span id=\"spanNext\"> Next</span> "
-					+ " Page <span id=\"spanPageNum\"></span> of <span id=\"spanTotalPage\"></span> Pages");
 			return builder.toString();
 		}finally {
 			lock.unlockRead();
@@ -472,8 +468,6 @@ public class Library {
 				i++;
 			}
 			builder.append("</tbody></table>");
-			builder.append("<span id=\"spanPre\">Previous</span> <span id=\"spanNext\"> Next</span> "
-					+ " Page <span id=\"spanPageNum\"></span> of <span id=\"spanTotalPage\"></span> Pages");
 			return builder.toString();
 		}finally {
 			lock.unlockRead();

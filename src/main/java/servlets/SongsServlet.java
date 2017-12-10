@@ -142,9 +142,17 @@ public class SongsServlet extends BaseServlet{
 					data.add(name, partial);
 				}
 			}
+			if(pageSize != null && pageSize.trim().length() > 0) {
+				out.println("<span id=\"spanPre\">Previous</span> <span id=\"spanNext\"> Next</span> \"\r\n" + 
+					"Page <span id=\"spanPageNum\"></span> of <span id=\"spanTotalPage\"></span> Pages");
+			}
 			out.println(library.searchToHtml(type2, partial));
 		}
 		if(viewtype != null) {
+			if(pageSize != null && pageSize.trim().length() > 0) {
+				out.println("<span id=\"spanPre\">Previous</span> <span id=\"spanNext\"> Next</span> \"\r\n" + 
+					"Page <span id=\"spanPageNum\"></span> of <span id=\"spanTotalPage\"></span> Pages");
+			}
 			if(viewtype.equals("alphabetically")) {
 				out.println(library.htmlByAlpha());
 			}
