@@ -89,14 +89,14 @@ public class LibraryBuilder {
 			System.out.println("interrupted");
 		}
 		sm = new SearchMethods(library, lock);
-//		wq = new WorkQueue(30);//TODO: uncomment later
-//		parseLastfm();
-//		this.wq.shutdown();
-//		try {
-//			this.wq.awaitTermination();
-//		} catch (InterruptedException e) {
-//			System.out.println("interrupted");
-//		}
+		wq = new WorkQueue(30);//TODO: uncomment later
+		parseLastfm();
+		this.wq.shutdown();
+		try {
+			this.wq.awaitTermination();
+		} catch (InterruptedException e) {
+			System.out.println("interrupted");
+		}
 		if(doSave) {
 			this.library.saveToFile(outputpath, order);
 		}
