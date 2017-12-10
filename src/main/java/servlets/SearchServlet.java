@@ -73,6 +73,7 @@ public class SearchServlet extends BaseServlet {
 		
 		out.println(header("Search Page"));		
 		out.println("<style>\r\n" + 
+				"body {TEXT-ALIGN: center;}"+
 				"#table1\r\n" + 
 				"{\r\n" + 
 				"	font-family:\"Trebuchet MS\", Arial, Helvetica, sans-serif;\r\n" + 
@@ -117,7 +118,8 @@ public class SearchServlet extends BaseServlet {
 		if(name != null) {
 			out.println("<h1>Hello, " + name + "!</h1>");
 			out.println("<p>Your last login time was: " + data.getLoginTime(name) + "</p>");
-		}else if(name == null) {
+		}
+		if(name == null) {
 			out.println("<h1>Hello, guest!</h1>");
 		}
 		

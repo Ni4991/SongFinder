@@ -60,6 +60,7 @@ public class SongsServlet extends BaseServlet{
 			out.println(data.clear(name));
 		}
 		out.println("<style>\r\n" + 
+				"body {TEXT-ALIGN: center;}"+
 				"#table1\r\n" + 
 				"{\r\n" + 
 				"	font-family:\"Trebuchet MS\", Arial, Helvetica, sans-serif;\r\n" + 
@@ -102,7 +103,13 @@ public class SongsServlet extends BaseServlet{
 				"}\r\n" + 
 				"</style>");
 		
-		out.println("<h1>Hello, " + name + "!</h1>");
+		if(name != null) {
+			out.println("<h1>Hello, " + name + "!</h1>");
+			out.println("<p>Your last login time was: " + data.getLoginTime(name) + "</p>");
+		}
+		if(name == null) {
+			out.println("<h1>Hello, guest!</h1>");
+		}
 		out.println("<p>You've got a song finder in me! Search for an artist, title or tag and "
 				+ "I will give you similar songs.</p><hr/>");
 		
