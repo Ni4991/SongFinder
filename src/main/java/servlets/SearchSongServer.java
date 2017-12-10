@@ -9,7 +9,9 @@ import java.util.TreeSet;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 
 import com.google.gson.JsonArray;
@@ -33,6 +35,8 @@ public class SearchSongServer {
 	public static void main(String[] args) throws Exception {
 		
 		Server server = new Server(8120);
+		
+		StopJettyHandler sjh = new StopJettyHandler(server);
         
         ServletContextHandler servhandler = new ServletContextHandler(ServletContextHandler.SESSIONS);        
         server.setHandler(servhandler);
@@ -50,6 +54,7 @@ public class SearchSongServer {
 				Library library = lb.getLibrary();
 				sce.getServletContext().setAttribute(BaseServlet.LIBRARY, library);
 				sce.getServletContext().setAttribute(BaseServlet.DATA, new Data());
+				sce.getServletContext().setAttribute("sjh", new StopJettyHandler(server));
 			}
         });
         
@@ -65,6 +70,13 @@ public class SearchSongServer {
         //start the server
         server.start();
         server.join();
+        
+        
+        	
+        
+        
+			
+        
 	}
 }
 
