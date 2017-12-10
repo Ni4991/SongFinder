@@ -56,19 +56,12 @@ public class SearchServlet extends BaseServlet {
 					}
 				}
 			}
-			if(!uname.equals("") && !passwd.equals("")) {
+			if(!uname.equals("") && passwd.equals("123")) {
 				response.sendRedirect("/verifyuser?name=" + uname + "&pass=" + passwd);
 				return;
 			}
 		}
 		
-		if(name != null) {
-			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  
-			String dateTime = dateFormat.format(new Date());  
-			data.addLoginTime(name, dateTime);
-		}
-		
-		//output text box requesting user name
 		PrintWriter out = prepareResponse(response);
 		
 		out.println(header("Search Page"));		
@@ -115,12 +108,12 @@ public class SearchServlet extends BaseServlet {
 				"	background-color:#b0c4de;\r\n" + 
 				"}\r\n" + 
 				"</style>");
-		if(name != null) {
+		
+		if(name == null|| name.trim().equals("")) {
+			out.println("<h1>Hello, guest!</h1>");
+		}else {
 			out.println("<h1>Hello, " + name + "!</h1>");
 			out.println("<p>Your last login time was: " + data.getLoginTime(name) + "</p>");
-		}
-		if(name == null) {
-			out.println("<h1>Hello, guest!</h1>");
 		}
 		
 		out.println("<div class=\"logo\"><a href=\"#\" title=\"logo\">"
@@ -137,7 +130,7 @@ public class SearchServlet extends BaseServlet {
 				+ "</select>");
 		out.println("search: <input type=\"text\" name=\"partial\" placeholder=\"partial/caseignore..\"/>");
 		//you'll see a private search checkbox only if you are logged in
-		if(name != null) {
+		if(name != null && !name.trim().equals("")) {
 			out.println("<input type=\"checkbox\" name=\"private\" value=\"private\" /> private search<br/>");
 		}
 		out.println(" Display<input type=\"text\" name=\"pageSize\" placeholder=\"default:display all\"/>results per page.");
@@ -162,7 +155,7 @@ public class SearchServlet extends BaseServlet {
 		
 		out.println("<form action=\"list\" method=\"post\">");
 		out.println("<input type=\"hidden\" name = \"history\" value=\"yes\"/>");
-		if(name != null) {
+		if(name != null && !name.trim().equals("")) {
 			out.println("View search history<input type=\"submit\" value=\"Go!\"/>");
 		}
 		out.println("</form>");
@@ -171,8 +164,6 @@ public class SearchServlet extends BaseServlet {
 		out.println("<input type=\"submit\" value=\"Logout\"/>");
 		out.println("</form>");
 		
-		
-
 		out.println(footer());	
 	}
 }

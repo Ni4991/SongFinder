@@ -47,10 +47,10 @@ public class SongsServlet extends BaseServlet{
 		
 		
 		if(home != null && home.equals("yes")) {
-			if(name != null) {
-				response.sendRedirect(response.encodeRedirectURL("/search?name=" + name));
+			if(name == null|| name.trim().equals("")) {
+				response.sendRedirect(response.encodeRedirectURL("/search?name="));
 			}else {
-				response.sendRedirect(response.encodeRedirectURL("/search"));
+				response.sendRedirect(response.encodeRedirectURL("/search?name=" + name));
 			}
 		}
 		
@@ -103,12 +103,11 @@ public class SongsServlet extends BaseServlet{
 				"}\r\n" + 
 				"</style>");
 		
-		if(name != null) {
+		if(name == null|| name.trim().equals("")) {
+			out.println("<h1>Hello, guest!</h1>");
+		}else {
 			out.println("<h1>Hello, " + name + "!</h1>");
 			out.println("<p>Your last login time was: " + data.getLoginTime(name) + "</p>");
-		}
-		if(name == null) {
-			out.println("<h1>Hello, guest!</h1>");
 		}
 		out.println("<p>You've got a song finder in me! Search for an artist, title or tag and "
 				+ "I will give you similar songs.</p><hr/>");
@@ -126,7 +125,7 @@ public class SongsServlet extends BaseServlet{
 				+ "</select>");
 		out.println("search: <input type=\"text\" name=\"partial\" placeholder=\"partial/caseignore..\"/>");
 		//you'll see a private search checkbox only if you are logged in
-		if(name != null) {
+		if(name != null && !name.trim().equals("")) {
 			out.println("<input type=\"checkbox\" name=\"private\" value=\"private\" /> private search<br/>");
 		}
 		out.println(" Display<input type=\"text\" name=\"pageSize\" placeholder=\"default:display all\"/>results per page.");
@@ -171,9 +170,16 @@ public class SongsServlet extends BaseServlet{
 		out.println("</center>");
 		
 		out.println("<form action=\"list\" method=\"post\">");
-		out.println("<input type=\"hidden\" name = \"home\" value=\"yes\"/>");
-		out.println("<input type=\"submit\" value=\"Go to search main page\"/>");
+		out.println("<input type=\"hidden\" name=\"popular\" value=\"yes\"/>");
+		out.println("View popular search<input type=\"submit\" value=\"Go!\"/>");
 		out.println("</form>");
+		
+		if(name != null && !name.trim().equals("")) {
+			out.println("<form action=\"list\" method=\"post\">");
+			out.println("<input type=\"hidden\" name = \"home\" value=\"yes\"/>");
+			out.println("<input type=\"submit\" value=\"Go to search main page\"/>");
+			out.println("</form>");
+		}
 		
 		out.println("<form action=\"logout\" method=\"post\">");
 		out.println("<input type=\"submit\" value=\"Logout\"/>");

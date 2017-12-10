@@ -2,6 +2,9 @@ package servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 
 import javax.servlet.ServletException;
@@ -31,7 +34,7 @@ public class VerifyUserServlet extends BaseServlet {
 		//no username info in session
 		if(name == null || name.trim().equals("")) {
 			//maybe username info in cookies
-			response.sendRedirect(response.encodeRedirectURL("/search"));
+			response.sendRedirect(response.encodeRedirectURL("/search?name="));
 		}
 		
 		HttpSession session = request.getSession();
@@ -47,7 +50,12 @@ public class VerifyUserServlet extends BaseServlet {
 							
 		//redirect to search
 		if(pass.equals("123")) {
+				DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  
+				String dateTime = dateFormat.format(new Date());  
+				data.addLoginTime(name, dateTime);
 			if(keep != null) {
+				
+				
 				Cookie username = new Cookie("username", name);
 				Cookie password = new Cookie("password", pass); 
 				
