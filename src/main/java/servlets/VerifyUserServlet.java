@@ -43,10 +43,10 @@ public class VerifyUserServlet extends BaseServlet {
 		session.setAttribute(NAME, name);
 		
 		Data data = (Data)getServletContext().getAttribute(DATA);
-		if((name != null || !name.trim().equals(""))){
+		if((name != null && !name.trim().equals(""))){
 			data.addUser(name);  
 		}
-					
+		
 		//redirect to search
 		if(pass.equals("123")) {
 				DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  

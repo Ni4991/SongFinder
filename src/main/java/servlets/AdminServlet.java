@@ -27,17 +27,19 @@ public class AdminServlet extends BaseServlet {
 		String delete = getParameterValue(request, "delete");
 		String shutdown = request.getParameter("shutdown");
 		
-		if(shutdown != null) {
-			sjh.shutdown();
-		}
-		
 		//if user has clicked delete, delete item from list
 		if(delete != null) {
 			data.deleteUser(name);
 		}
 		
 		PrintWriter out = prepareResponse(response);
-		out.println(header("Admin page"));		
+		out.println(header("Admin page"));	
+		
+		if(shutdown != null) {
+			sjh.shutdown();
+			out.println("You shutdown the server.");
+		}
+		
 		out.println("<center>");		
 		out.println(data.usersListToHtml());
 		out.println("<br/><hr/>");

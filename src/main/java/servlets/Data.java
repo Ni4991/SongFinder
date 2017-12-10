@@ -71,7 +71,7 @@ public class Data {
 					}
 				}
 			}
-			// ref: http://blog.csdn.net/xiaokui_wingfly/article/details/42964695
+			// reference: http://blog.csdn.net/xiaokui_wingfly/article/details/42964695
 			List<Entry<String, Integer>> list = new ArrayList<Map.Entry<String, Integer>>(popularSearch.entrySet());  
 	
 			Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {  
@@ -180,8 +180,5 @@ public class Data {
 		}finally {
 			lock.unlockRead();
 		}
-		
 	}
-
-
 }
