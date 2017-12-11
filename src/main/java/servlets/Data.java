@@ -78,8 +78,7 @@ public class Data {
 			   
 				@Override
 				public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
-					// TODO Auto-generated method stub
-					 return o2.getValue() - (o1.getValue()); // desc
+					return o2.getValue() - (o1.getValue()); // desc
 				}  
 			});  
 			StringBuilder builder = new StringBuilder();
@@ -106,7 +105,6 @@ public class Data {
 		}finally {
 			lock.unlockRead();
 		}
-		
 	}
 	
 	/*
@@ -164,7 +162,6 @@ public class Data {
 			lock.unlockRead();
 		}
 	}
-	
 
 	/*
 	 * Returns a String containing an HTML representation of the

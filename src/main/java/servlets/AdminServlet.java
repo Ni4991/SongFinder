@@ -27,7 +27,7 @@ public class AdminServlet extends BaseServlet {
 		String delete = getParameterValue(request, "delete");
 		String shutdown = request.getParameter("shutdown");
 		
-		//if user has clicked delete, delete item from list
+		//if admin has clicked delete, delete that user from list
 		if(delete != null) {
 			data.deleteUser(name);
 		}
