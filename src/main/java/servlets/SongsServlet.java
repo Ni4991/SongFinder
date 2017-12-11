@@ -107,6 +107,8 @@ public class SongsServlet extends BaseServlet{
 			out.println("<h1>Hello, " + name + "!</h1>");
 			out.println("<p>Your last login time was: " + data.getLoginTime(name) + "</p>");
 		}
+		out.println("<div class=\"logo\"><a href=\"#\" title=\"logo\">"
+				+ "<img src=http://s1.sinaimg.cn/large/003wnHkdzy7gudQgA0w50&690 />" + "</a></div>");
 		out.println("<p>You've got a song finder in me! Search for an artist, title or tag and "
 				+ "I will give you similar songs.</p><hr/>");
 		
