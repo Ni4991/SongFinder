@@ -66,5 +66,44 @@ public class Fetcher implements Runnable {
 		} catch (JsonParseException pe) {
 			System.err.println(artist + " Unable to execute tests. " + pe.getMessage());
 		}
+		
+		String albuminfo = HTTPFetcher.download("ws.audioscrobbler.com", "/2.0/?method=artist.gettopalbums"
+				+ "&artist="+ artist +"&api_key=9162bc3f7439ff3d4258613b75d37287&format=json");
+		try(Scanner sc = new Scanner(albuminfo)){
+			while(sc.hasNextLine()) {
+				String line = sc.nextLine();
+				if(line.trim().length() == 0) {
+					line = sc.nextLine();
+					if(line.trim().startsWith("{\"topalbums\"")) {
+						JsonParser parser = new JsonParser();
+						JsonObject toJson = (JsonObject) parser.parse(line);
+						toJson = toJson.getAsJsonObject("topalbums");
+						JsonArray albums = toJson.get("album").getAsJsonArray();
+						//show top 5 albums
+						int top5 = 5;
+						if(albums.size() < 5) {
+							top5 = albums.size();
+						}
+						StringBuilder builder = new StringBuilder();
+						builder.append("<ol>");
+						for(int j = 0; j < top5; j++) {
+							String albumName = albums.get(j).getAsJsonObject().get("name").getAsString();
+							String acount = albums.get(j).getAsJsonObject().get("playcount").getAsString();
+							int albumcount = Integer.parseInt(acount);
+							String url = albums.get(j).getAsJsonObject().get("url").getAsString();
+							String image = albums.get(j).getAsJsonObject().getAsJsonArray("image").get(2).getAsJsonObject().get("#text").getAsString();
+							builder.append("<li><ul><li>album name: " + albumName + "</li>"
+									+ "<li>playcount: " + albumcount + "</li>" + "<li>image: <img src=" + image + "</li>");
+							builder.append("<li>url: <a href=\"" + url + "\">" + url + "</a></li>");
+							builder.append("</ul></li>");
+						}
+						builder.append("</ol>");
+						library.addAlbum(artist, builder.toString());
+					}
+				}
+			}
+		} catch (JsonParseException pe) {
+			System.err.println(artist + " Unable to execute tests. " + pe.getMessage());
+		}
 	}
 }

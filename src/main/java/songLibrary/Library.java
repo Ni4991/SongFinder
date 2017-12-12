@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -28,7 +27,6 @@ import com.google.gson.JsonParser;
 
 import concurrent.Lock;
 import general.SongInfo;
-import servlets.ArtistInfo;
 import servlets.CompareByAlpha;
 import servlets.CompareByPCount;
 import socket.HTTPFetcher;
@@ -47,6 +45,7 @@ public class Library {
 	private String order;
 	private Map<String, TreeSet<SongInfo>> byArtist, byTitle, byTag;
 	private HashMap<String, SongInfo> byTrack_id;
+	private HashMap<String, String> artistToAlbums;
 	private HashMap<String, TreeSet<SongInfo>> byArtistForSearch;
 	private HashMap<String, TreeSet<SongInfo>> byTitleForSearch;
 	private HashMap<String, TreeSet<SongInfo>> byTagForSearch;
@@ -68,6 +67,13 @@ public class Library {
 		artistsByPCount = new TreeSet<ArtistInfo>(new CompareByPCount());
 		artistsByAlpha = new TreeSet<ArtistInfo>(new CompareByAlpha());
 		copyArtists = new HashSet<String>();
+		artistToAlbums = new HashMap<String, String>();
+	}
+	
+	public void addAlbum(String artist, String albums) {
+		lock.lockWrite();
+		artistToAlbums.put(artist, albums);
+		lock.unlockWrite();
 	}
 	
 	/**
@@ -217,7 +223,9 @@ public class Library {
 				SongInfo song = new SongInfo(si.getArtist(), si.getTitle(), null, si.getTrack_id(), null);
 				ArrayList<String> newSimilars = new ArrayList<String>();
 				for(String simi : si.getSimilars()) {
-					newSimilars.add(simi);
+					if(byTrack_id.containsKey(simi)) {
+						newSimilars.add(byTrack_id.get(simi).getTitle());
+					}
 				}
 				ArrayList<String> titlesToSearch = new ArrayList<String>();
 				titlesToSearch.add(song.getTitle());
@@ -234,12 +242,21 @@ public class Library {
 				else if((i % 2 != 0)) {
 					builder.append(s2);
 				}
-				builder.append("<td>" + song.getArtist() + "</td>"
+				if(artistToAlbums.containsKey(song.getArtist())) {
+					builder.append("<td><details>\r\n" + 
+							"    <summary>"+ song.getArtist() +"</summary>\r\n" + 
+							"        <p>top albums: </p>\r\n");
+					builder.append(artistToAlbums.get(song.getArtist()));
+					builder.append("</details> " + "</td>");
+				}else {
+					builder.append("<td>" + song.getArtist() + "</td>");
+				}
+				builder.append("</details> " + "</td>"
 						+ "<td><details>\r\n" + 
 						"    <summary>"+ song.getTitle() +"</summary>\r\n" + 
 						"        <p>details: </p>\r\n" + 
 						"        <ul>\r\n" + 
-						"			 <li><img src=" + img + "alt=\"img\" />" +
+						"			 <li><img src=" + img + "alt=\"img\" /></li>" +
 						"            <li>artist name: " + song.getArtist() + "</li>\r\n" + 
 						"            <li>title: "+ song.getTitle() + "</li>\r\n" + 
 						"            <li>similar songs: " + newSimilars + "</li>\r\n" + 
@@ -252,7 +269,6 @@ public class Library {
 		}finally {
 			lock.unlockRead();
 		}
-		
 	}
 	
 	/**
@@ -476,7 +492,7 @@ public class Library {
 	}
 	
 	/**
-	 * add method for project 3.
+	 * add method for project 3, display all artists by play count/alphabetically.
 	 * @param ai
 	 */
 	public void addArtistInfo(ArtistInfo ai) {
@@ -487,7 +503,7 @@ public class Library {
 	}
 	
 	/**
-	 * get a set of all artists.
+	 * return a sets of all artists.
 	 * @return
 	 */
 	public HashSet<String> getCopyArtists() {

@@ -19,8 +19,8 @@ import com.google.gson.JsonParser;
 
 import general.LibraryBuilder;
 import general.SongInfo;
-import servlets.ArtistInfo;
 import servlets.SearchServlet;
+import songLibrary.ArtistInfo;
 import songLibrary.Library;
 
 public class SocketDriver {

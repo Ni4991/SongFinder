@@ -4,6 +4,8 @@ import org.json.JSONException;
 
 import general.LibraryBuilder;
 import general.ParseArgs;
+import socket.HTTPFetcher;
+import songLibrary.ArtistInfo;
 
 /**
  * main class for SongFinder lab and projects.
@@ -27,6 +29,7 @@ public class Driver {
 					,pa.getOutputpath(), pa.getArtistsToSearch(), pa.getTitlesToSearch(), 
 					pa.getTagsToSearch(), pa.getDoSearch(), pa.getSearchOutputpath());
 			lb.build();	//TODO: uncomment before submit
+			
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}	

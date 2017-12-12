@@ -132,6 +132,17 @@ public class SongsServlet extends BaseServlet{
 		out.println("<input type=\"submit\" value=\"Search\"/>");
 		out.println("</form>");
 		
+		out.println("<form action=\"list\" method=\"post\">");
+		out.println("<label>View all artists...</label>" 
+				+ "<select name=\"viewtype\">"
+				+ "<option value=\"\"></option>" 
+				+ "<option value=\"alphabetically\">alphabetically</option>" 
+				+ "<option value=\"byplaycount\">by play count</option>" 
+				+ "</select>");
+		out.println("Display<input type=\"text\" name=\"pageSize\" placeholder=\"default:display all\"/>results per page.");
+		out.println("<input type=\"submit\" value=\"Go\"/>");
+		out.println("</form>");	
+		
 		if(showHistory != null && showHistory.equals("yes")) {
 			out.println(data.hisToHtml(name));
 			out.println("<form action=\"list\" method=\"post\">");
@@ -301,7 +312,6 @@ public class SongsServlet extends BaseServlet{
 					"     hide();\r\n" + 
 					"</script>\r\n" + 
 					"");
-
 		}
-			}
+	}
 }

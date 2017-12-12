@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Scanner;
 
+import concurrent.AlbumFetcher;
 import concurrent.Fetcher;
 import concurrent.Lock;
 import concurrent.WorkQueue;
@@ -38,6 +39,7 @@ public class LibraryBuilder {
 	private Lock lock;
 	private boolean doSearch, doSave;
 	
+	//constructor for project3
 	public LibraryBuilder() {
 		inputpath = "input";
 		outputpath = "output";
@@ -50,6 +52,7 @@ public class LibraryBuilder {
 		doSave = false;
 	}
 	
+	//constructor for project1
 	public LibraryBuilder (String inputpath, int nThreads, String order, String outputpath) {
 		this.order = order;
 		this.inputpath = inputpath;
@@ -62,6 +65,7 @@ public class LibraryBuilder {
 		doSave = true;
 	}
 	
+	//constructor for project2
 	public LibraryBuilder (String inputpath, int nThreads, String order, String outputpath, 
 			ArrayList<String> artistsToSearch, ArrayList<String> titlesToSearch, 
 			ArrayList<String> tagsToSearch, boolean doSearch, String searchoutputpath) {
@@ -104,15 +108,15 @@ public class LibraryBuilder {
 			this.sm.search(artistsToSearch, titlesToSearch, tagsToSearch, searchOutputpath);
 		}
 	}
+	
 	/**
-	 * 
+	 * fetch artist info from last.fm
 	 */
 	private void parseLastfm() {		
 		for(String artist : library.getCopyArtists()) {
 			try {
 				artist = URLEncoder.encode(artist, "UTF-8");
 			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			this.wq.execute(new Fetcher(artist, library));

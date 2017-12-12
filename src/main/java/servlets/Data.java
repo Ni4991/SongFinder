@@ -28,6 +28,10 @@ public class Data {
 		lock = new Lock();
 	}
 	
+	/**
+	 * return a list of all users.
+	 * @return
+	 */
 	public String usersListToHtml() {
 		try {
 			lock.lockRead();
@@ -48,6 +52,10 @@ public class Data {
 		}
 	}
 	
+	/**
+	 * delete a user.
+	 * @param name
+	 */
 	public void deleteUser(String name) {
 		try {
 			lock.lockWrite();
@@ -59,6 +67,10 @@ public class Data {
 		}
 	}
 	
+	/**
+	 * for feature suggested search
+	 * @return
+	 */
 	public String getPopSearch() {
 		try {
 			lock.lockRead();
@@ -80,7 +92,7 @@ public class Data {
 				public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
 					return o2.getValue() - (o1.getValue()); // desc
 				}  
-			});  
+			}); 
 			StringBuilder builder = new StringBuilder();
 			builder.append("<table align=\"center\" border=1 border-spacing=3px>");
 			builder.append("<thead><tr><th>Search item</th><th>Times searched</th></tr></thead><tbody>");
@@ -96,7 +108,7 @@ public class Data {
 	}
 		
 	/*
-	 * Returns true if the user exists in the data store.
+	 * returns true if the user exists in the data store.
 	 */
 	public boolean userExists(String name) {
 		try {
@@ -108,7 +120,7 @@ public class Data {
 	}
 	
 	/*
-	 * Add a new UserInfo object for a particular user.
+	 * add a new UserInfo object for a particular user.
 	 */
 	public void addUser(String name) {
 		lock.lockWrite();
@@ -119,7 +131,7 @@ public class Data {
 	}
 
 	/*
-	 * For a given user, add a new todo.
+	 * For a given user, add a new search.
 	 */
 	public void add(String name, String item) {
 		lock.lockWrite();
@@ -139,6 +151,11 @@ public class Data {
 		lock.unlockWrite();
 	}
 	
+	/**
+	 * allow a user to clear own search history.
+	 * @param name
+	 * @return
+	 */
 	public String clear(String name) {
 		try {
 			lock.lockWrite();
@@ -164,8 +181,7 @@ public class Data {
 	}
 
 	/*
-	 * Returns a String containing an HTML representation of the
-	 * list associated with the session identified by id.
+	 * return html representation of search history.
 	 */
 	public String hisToHtml(String name) {
 		try {

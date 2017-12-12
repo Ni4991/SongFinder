@@ -7,7 +7,6 @@ public class StopJettyHandler {
 	private Server server;
 
 	public StopJettyHandler(Server server) {
-		// TODO Auto-generated constructor stub
 		this.server = server;
 	}
 

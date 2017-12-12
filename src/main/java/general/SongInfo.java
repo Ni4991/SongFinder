@@ -2,7 +2,10 @@ package general;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
+
+import concurrent.Lock;
 
 /**
  * a class to hold info of a single song.
@@ -13,6 +16,7 @@ public class SongInfo {
 	private String artist, title, track_id, image;
 	private HashSet<String> tags;
 	private ArrayList<String> similars;
+	private Lock lock;
 	
 	public SongInfo(String artist, String title, HashSet<String> tags, String track_id, ArrayList<String> similars) {
 		this.artist = artist;
@@ -20,10 +24,6 @@ public class SongInfo {
 		this.tags = tags;
 		this.track_id = track_id;
 		this.similars = similars;
-	}
-	
-	public void addImage(String img) {
-		this.image = img;
 	}
 	
 	/**

@@ -2,6 +2,8 @@ package servlets;
 
 import java.util.Comparator;
 
+import songLibrary.ArtistInfo;
+
 public class CompareByPCount implements Comparator<ArtistInfo>{
 
 	@Override

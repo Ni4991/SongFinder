@@ -44,7 +44,6 @@ public class SearchSongServer {
         servhandler.addEventListener(new ServletContextListener() {
 
         	public void contextDestroyed(ServletContextEvent sce) {
-				// TODO Auto-generated method stub
 				
 			}
         		
@@ -69,14 +68,7 @@ public class SearchSongServer {
         server.setHandler(servhandler);
         //start the server
         server.start();
-        server.join();
-        
-        
-        	
-        
-        
-			
-        
+        server.join();   
 	}
 }
 
