@@ -1,4 +1,4 @@
-package servlets;
+package songLibrary;
 
 /**
  * a class to store info for a single artist.

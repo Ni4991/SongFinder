@@ -42,8 +42,6 @@ public class SongsServlet extends BaseServlet{
 		HttpSession session = request.getSession();
 		String name = (String) session.getAttribute(NAME);
 		
-		
-		
 		if(home != null && home.equals("yes")) {
 			if(name == null|| name.trim().equals("")) {
 				response.sendRedirect(response.encodeRedirectURL("/search?name="));
@@ -154,8 +152,8 @@ public class SongsServlet extends BaseServlet{
 		out.println("<center>");
 	
 		if(partial != null) {
-			if(name != null) {
-				if(pri == null) {
+			if(name != null && name.trim().length() > 0) {
+				if(pri == null) {//if private search not turned on
 					data.add(name, partial);
 				}
 			}

@@ -18,6 +18,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import socket.HTTPFetcher;
+import songLibrary.ArtistInfo;
 import songLibrary.Library;
 
 public class TempDisplayServlet extends BaseServlet{

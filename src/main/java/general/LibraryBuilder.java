@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Scanner;
 
-import concurrent.AlbumFetcher;
 import concurrent.Fetcher;
 import concurrent.Lock;
 import concurrent.WorkQueue;
