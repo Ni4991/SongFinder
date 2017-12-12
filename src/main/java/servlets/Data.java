@@ -46,7 +46,8 @@ public class Data {
 					builder.append("<li>" + search + "</li>");
 				}
 				builder.append("</ul></details></td><td><form action=\"admin?delete=" + user
-						+ "\" method=\"post\"><input type=\"submit\" value=\"delete\"></form></td></tr></b>");
+						+ "\" method=\"post\"><input type=\"submit\" value=\"delete\">"
+						+ "<input type=\"hidden\" name=\"todelete\" value=" + user + "></form></td></tr></b>");
 			}
 			builder.append("</table>");
 			return builder.toString();

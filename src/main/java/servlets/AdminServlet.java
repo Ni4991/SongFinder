@@ -23,13 +23,13 @@ public class AdminServlet extends BaseServlet {
 		StopJettyHandler sjh = (StopJettyHandler)getServletConfig().getServletContext().getAttribute("sjh");
 		Data data = (Data) getServletConfig().getServletContext().getAttribute(DATA);
 		HttpSession session = request.getSession();
-		String name = (String) session.getAttribute(NAME);
 		String delete = getParameterValue(request, "delete");
 		String shutdown = request.getParameter("shutdown");
+		String toDelete = request.getParameter("todelete");
 		
 		//if admin has clicked delete, delete that user from list
 		if(delete != null) {
-			data.deleteUser(name);
+			data.deleteUser(toDelete);
 		}
 		
 		PrintWriter out = prepareResponse(response);
