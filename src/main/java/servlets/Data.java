@@ -68,24 +68,10 @@ public class Data {
 		lock.unlockWrite();
 	}
 
-	/**
-	 * for feature suggested search
-	 * 
-	 * @return
-	 */
 	public String getPopSearch() {
 		try {
 			lock.lockRead();
 			if (userInfo.keySet() != null) {
-				for (String user : userInfo.keySet()) {
-					for (String search : userInfo.get(user).getSearches()) {
-						if (popularSearch.containsKey(search)) {
-							popularSearch.put(search, popularSearch.get(search) + 1);
-						} else {
-							popularSearch.put(search, 1);
-						}
-					}
-				}
 				// reference: http://blog.csdn.net/xiaokui_wingfly/article/details/42964695
 				List<Entry<String, Integer>> list = new ArrayList<Map.Entry<String, Integer>>(popularSearch.entrySet());
 
@@ -106,10 +92,25 @@ public class Data {
 				builder.append("</tbody></table>");
 				return builder.toString();
 			}
-			return "no search record.";
+			return "<p>no search record.</p>";
 		} finally {
 			lock.unlockRead();
 		}
+	}
+
+	/**
+	 * for feature suggested search
+	 * 
+	 * @return
+	 */
+	public void addPopSearch(String searchitem) {
+		lock.lockWrite();
+		if (popularSearch.containsKey(searchitem)) {
+			popularSearch.put(searchitem, popularSearch.get(searchitem) + 1);
+		} else {
+			popularSearch.put(searchitem, 1);
+		}
+		lock.unlockWrite();
 	}
 
 	/*
@@ -141,29 +142,27 @@ public class Data {
 	public void add(String name, String item) {
 		try {
 			lock.lockWrite();
-		if (!userInfo.containsKey(name)) {
-			return;
-		}
-		userInfo.get(name).addSearch(item);
-		}finally {
+			if (!userInfo.containsKey(name)) {
+				return;
+			}
+			userInfo.get(name).addSearch(item);
+		} finally {
 			lock.unlockWrite();
 		}
-		
-		
+
 	}
 
 	public void addLoginTime(String name, String loginTime) {
-		try{
+		try {
 			lock.lockWrite();
 			if (!userInfo.containsKey(name)) {
-			return;
-		}
-		userInfo.get(name).setLoginTime(loginTime);
-		}finally {
+				return;
+			}
+			userInfo.get(name).setLoginTime(loginTime);
+		} finally {
 			lock.unlockWrite();
 		}
-		
-		
+
 	}
 
 	/**

@@ -153,6 +153,7 @@ public class SongsServlet extends BaseServlet{
 	
 		if(partial != null) {
 			if(name != null && name.trim().length() > 0) {
+				data.addPopSearch(partial);//even if private search is turned on, the search item is added to searches' database.
 				if(pri == null) {//if private search not turned on
 					data.add(name, partial);
 				}
