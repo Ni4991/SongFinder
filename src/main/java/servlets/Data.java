@@ -17,19 +17,20 @@ import concurrent.Lock;
 
 public class Data {
 
-	//maintain a map of name to UserInfo object
+	// maintain a map of name to UserInfo object
 	protected HashMap<String, UserInfo> userInfo;
 	private TreeMap<String, Integer> popularSearch;
 	private Lock lock;
 
 	public Data() {
 		userInfo = new HashMap<String, UserInfo>();
-		popularSearch = new TreeMap<String, Integer>(); 
+		popularSearch = new TreeMap<String, Integer>();
 		lock = new Lock();
 	}
-	
+
 	/**
 	 * return a list of all users.
+	 * 
 	 * @return
 	 */
 	public String usersListToHtml() {
@@ -38,45 +39,46 @@ public class Data {
 			StringBuilder builder = new StringBuilder();
 			builder.append("<table border=1 border-spacing=3px>");
 			builder.append("<tr><td colspan=2><b>List of all users</b></td></tr>");
-			for(String user: userInfo.keySet()) {
-				builder.append("<b><tr><td>" + "<details><summary>"+ user + "</summary>" + "<p>search history: </p><ul>");
-				for(String search : userInfo.get(user).getSearches()) {
+			for (String user : userInfo.keySet()) {
+				builder.append(
+						"<b><tr><td>" + "<details><summary>" + user + "</summary>" + "<p>search history: </p><ul>");
+				for (String search : userInfo.get(user).getSearches()) {
 					builder.append("<li>" + search + "</li>");
 				}
-				builder.append("</ul></details></td><td><form action=\"admin?delete=" + user + "\" method=\"post\"><input type=\"submit\" value=\"delete\"></form></td></tr></b>");
+				builder.append("</ul></details></td><td><form action=\"admin?delete=" + user
+						+ "\" method=\"post\"><input type=\"submit\" value=\"delete\"></form></td></tr></b>");
 			}
 			builder.append("</table>");
 			return builder.toString();
-		}finally {
+		} finally {
 			lock.unlockRead();
 		}
 	}
-	
+
 	/**
 	 * delete a user.
+	 * 
 	 * @param name
 	 */
 	public void deleteUser(String name) {
-		try {
-			lock.lockWrite();
-			if(userInfo.containsKey(name)) {
-				userInfo.remove(name);
-			}
-		}finally {
-			lock.unlockWrite();
+		lock.lockWrite();
+		if (userInfo.containsKey(name)) {
+			userInfo.remove(name);
 		}
+		lock.unlockWrite();
 	}
-	
+
 	/**
 	 * for feature suggested search
+	 * 
 	 * @return
 	 */
 	public String getPopSearch() {
 		try {
 			lock.lockRead();
-			if(userInfo.keySet() != null) {
-				for(String user : userInfo.keySet()) {
-					for(String search : userInfo.get(user).getSearches()) {
+			if (userInfo.keySet() != null) {
+				for (String user : userInfo.keySet()) {
+					for (String search : userInfo.get(user).getSearches()) {
 						if (popularSearch.containsKey(search)) {
 							popularSearch.put(search, popularSearch.get(search) + 1);
 						} else {
@@ -85,31 +87,31 @@ public class Data {
 					}
 				}
 				// reference: http://blog.csdn.net/xiaokui_wingfly/article/details/42964695
-				List<Entry<String, Integer>> list = new ArrayList<Map.Entry<String, Integer>>(popularSearch.entrySet());  
-		
-				Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {  
-				   
+				List<Entry<String, Integer>> list = new ArrayList<Map.Entry<String, Integer>>(popularSearch.entrySet());
+
+				Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
+
 					@Override
 					public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
 						return o2.getValue() - (o1.getValue()); // desc
-					}  
-				}); 
+					}
+				});
 				StringBuilder builder = new StringBuilder();
 				builder.append("<table align=\"center\" border=1 border-spacing=3px>");
 				builder.append("<thead><tr><th>Search item</th><th>Times searched</th></tr></thead><tbody>");
-				for (Entry<String, Integer> mapping : list) {   
-					builder.append("<tr><td>" + mapping.getKey() + "</td>"
-							+ "<td>" + mapping.getValue()+ "</td></tr>");
-				}  
+				for (Entry<String, Integer> mapping : list) {
+					builder.append(
+							"<tr><td>" + mapping.getKey() + "</td>" + "<td>" + mapping.getValue() + "</td></tr>");
+				}
 				builder.append("</tbody></table>");
 				return builder.toString();
 			}
-		return "no search record.";
-		}finally {
+			return "no search record.";
+		} finally {
 			lock.unlockRead();
 		}
 	}
-		
+
 	/*
 	 * returns true if the user exists in the data store.
 	 */
@@ -117,17 +119,17 @@ public class Data {
 		try {
 			lock.lockRead();
 			return userInfo.containsKey(name);
-		}finally {
+		} finally {
 			lock.unlockRead();
 		}
 	}
-	
+
 	/*
 	 * add a new UserInfo object for a particular user.
 	 */
 	public void addUser(String name) {
 		lock.lockWrite();
-		if(!userInfo.containsKey(name)) {
+		if (!userInfo.containsKey(name)) {
 			userInfo.put(name, new UserInfo(name, lock));
 		}
 		lock.unlockWrite();
@@ -137,48 +139,59 @@ public class Data {
 	 * For a given user, add a new search.
 	 */
 	public void add(String name, String item) {
-		lock.lockWrite();
-		if(!userInfo.containsKey(name)) {
+		try {
+			lock.lockWrite();
+		if (!userInfo.containsKey(name)) {
 			return;
 		}
 		userInfo.get(name).addSearch(item);
-		lock.unlockWrite();
+		}finally {
+			lock.unlockWrite();
+		}
+		
+		
 	}
-	
+
 	public void addLoginTime(String name, String loginTime) {
-		lock.lockWrite();
-		if(!userInfo.containsKey(name)) {
+		try{
+			lock.lockWrite();
+			if (!userInfo.containsKey(name)) {
 			return;
 		}
 		userInfo.get(name).setLoginTime(loginTime);
-		lock.unlockWrite();
+		}finally {
+			lock.unlockWrite();
+		}
+		
+		
 	}
-	
+
 	/**
 	 * allow a user to clear own search history.
+	 * 
 	 * @param name
 	 * @return
 	 */
 	public String clear(String name) {
 		try {
 			lock.lockWrite();
-			if(userInfo.containsKey(name)) {
+			if (userInfo.containsKey(name)) {
 				userInfo.get(name).clear();
 			}
 			return "<p>You have cleared your search history.</p>";
-		}finally {
+		} finally {
 			lock.unlockWrite();
 		}
 	}
-	
+
 	public String getLoginTime(String name) {
 		try {
 			lock.lockRead();
-			if(!userInfo.containsKey(name)) {
+			if (!userInfo.containsKey(name)) {
 				return null;
-			}	
+			}
 			return userInfo.get(name).getLoginTime();
-		}finally {
+		} finally {
 			lock.unlockRead();
 		}
 	}
@@ -189,11 +202,11 @@ public class Data {
 	public String hisToHtml(String name) {
 		try {
 			lock.lockRead();
-			if(!userInfo.containsKey(name)) {
+			if (!userInfo.containsKey(name)) {
 				return null;
-			}	
+			}
 			return userInfo.get(name).historyToHtml();
-		}finally {
+		} finally {
 			lock.unlockRead();
 		}
 	}
