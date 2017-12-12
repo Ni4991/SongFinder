@@ -74,34 +74,37 @@ public class Data {
 	public String getPopSearch() {
 		try {
 			lock.lockRead();
-			for(String user : userInfo.keySet()) {
-				for(String search : userInfo.get(user).getSearches()) {
-					if (popularSearch.containsKey(search)) {
-						popularSearch.put(search, popularSearch.get(search) + 1);
-					} else {
-						popularSearch.put(search, 1);
+			if(userInfo.keySet() != null) {
+				for(String user : userInfo.keySet()) {
+					for(String search : userInfo.get(user).getSearches()) {
+						if (popularSearch.containsKey(search)) {
+							popularSearch.put(search, popularSearch.get(search) + 1);
+						} else {
+							popularSearch.put(search, 1);
+						}
 					}
 				}
-			}
-			// reference: http://blog.csdn.net/xiaokui_wingfly/article/details/42964695
-			List<Entry<String, Integer>> list = new ArrayList<Map.Entry<String, Integer>>(popularSearch.entrySet());  
-	
-			Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {  
-			   
-				@Override
-				public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
-					return o2.getValue() - (o1.getValue()); // desc
+				// reference: http://blog.csdn.net/xiaokui_wingfly/article/details/42964695
+				List<Entry<String, Integer>> list = new ArrayList<Map.Entry<String, Integer>>(popularSearch.entrySet());  
+		
+				Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {  
+				   
+					@Override
+					public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
+						return o2.getValue() - (o1.getValue()); // desc
+					}  
+				}); 
+				StringBuilder builder = new StringBuilder();
+				builder.append("<table align=\"center\" border=1 border-spacing=3px>");
+				builder.append("<thead><tr><th>Search item</th><th>Times searched</th></tr></thead><tbody>");
+				for (Entry<String, Integer> mapping : list) {   
+					builder.append("<tr><td>" + mapping.getKey() + "</td>"
+							+ "<td>" + mapping.getValue()+ "</td></tr>");
 				}  
-			}); 
-			StringBuilder builder = new StringBuilder();
-			builder.append("<table align=\"center\" border=1 border-spacing=3px>");
-			builder.append("<thead><tr><th>Search item</th><th>Times searched</th></tr></thead><tbody>");
-			for (Entry<String, Integer> mapping : list) {   
-				builder.append("<tr><td>" + mapping.getKey() + "</td>"
-						+ "<td>" + mapping.getValue()+ "</td></tr>");
-			}  
-			builder.append("</tbody></table>");
-			return builder.toString();
+				builder.append("</tbody></table>");
+				return builder.toString();
+			}
+		return "no search record.";
 		}finally {
 			lock.unlockRead();
 		}
